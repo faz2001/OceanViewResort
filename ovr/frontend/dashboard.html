@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" id="html-root">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ocean View Resort — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════
+   CSS VARIABLES — DUAL THEME
+═══════════════════════════════════════════════════ */
+:root {
+  --bg:      #0B132B;
+  --bg2:     #1C2541;
+  --panel:   rgba(28,37,65,.85);
+  --sidebar: rgba(11,19,43,.92);
+  --topbar:  rgba(11,19,43,.95);
+  --accent:  #5BC0BE;
+  --adim:    rgba(91,192,190,.12);
+  --aglow:   rgba(91,192,190,.22);
+  --txt:     #E8EAF0;
+  --txt2:    #BDC3C7;
+  --muted:   #6B7D96;
+  --border:  rgba(91,192,190,.16);
+  --bsub:    rgba(255,255,255,.05);
+  --err:     #E05C5C;
+  --ok:      #4CAF87;
+  --warn:    #E0A050;
+  --r:       8px;
+  --rs:      5px;
+  --shadow:  0 8px 40px rgba(0,0,0,.5);
+}
+[data-theme="light"] {
+  --bg:      #F8FAFC;
+  --bg2:     #FFFFFF;
+  --panel:   rgba(255,255,255,.82);
+  --sidebar: rgba(255,255,255,.9);
+  --topbar:  rgba(255,255,255,.94);
+  --accent:  #0077B6;
+  --adim:    rgba(0,119,182,.08);
+  --aglow:   rgba(0,119,182,.18);
+  --txt:     #0B132B;
+  --txt2:    #1E3A5F;
+  --muted:   #64748B;
+  --border:  rgba(0,119,182,.15);
+  --bsub:    rgba(0,0,0,.05);
+  --err:     #D93B3B;
+  --ok:      #0A9B6A;
+  --warn:    #B45309;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;
+  transition:background-color .35s,color .35s,border-color .35s,box-shadow .35s;}
+html,body{height:100%;font-family:'Inter',sans-serif;}
+body{background:var(--bg);color:var(--txt);overflow:hidden;}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 10% 20%,var(--aglow) 0%,transparent 55%),
+    radial-gradient(ellipse 60% 70% at 90% 80%,var(--adim)  0%,transparent 55%);
+}
+/* ── Layout ── */
+.app{display:flex;height:100vh;overflow:hidden;position:relative;z-index:1;}
+/* ── Sidebar ── */
+.sidebar{
+  width:218px;flex-shrink:0;
+  background:var(--sidebar);
+  border-right:1px solid var(--border);
+  backdrop-filter:blur(20px);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.sb-brand{padding:20px 16px 16px;border-bottom:1px solid var(--border);}
+.sb-logo{display:flex;align-items:center;gap:9px;margin-bottom:2px;}
+.sb-icon{
+  width:32px;height:32px;background:var(--adim);
+  border:1px solid var(--accent);border-radius:7px;
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+}
+.sb-name{
+  font-family:'Playfair Display',serif;font-size:13.5px;font-weight:600;
+  color:var(--txt);line-height:1.2;
+}
+.sb-sub{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:3px;}
+.sb-user{
+  padding:11px 14px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:9px;
+}
+.user-av{
+  width:30px;height:30px;border-radius:50%;flex-shrink:0;
+  background:var(--adim);border:1.5px solid var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:600;color:var(--accent);
+}
+.user-info small{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+.user-info p{font-size:12px;font-weight:500;color:var(--txt);}
+.sb-nav{flex:1;padding:9px 7px;overflow-y:auto;}
+.nav-lbl{font-size:8.5px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--muted);padding:9px 10px 4px;}
+.nav-item{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 10px;border-radius:var(--rs);
+  cursor:pointer;font-size:12.5px;color:var(--txt2);
+  user-select:none;margin-bottom:2px;transition:all .2s;
+}
+.nav-item:hover{background:var(--adim);color:var(--txt);}
+.nav-item.active{
+  background:var(--adim);color:var(--accent);
+  border-left:2px solid var(--accent);padding-left:8px;
+}
+.nav-ico{width:19px;height:19px;flex-shrink:0;display:flex;
+  align-items:center;justify-content:center;font-size:14px;}
+.nav-badge{
+  margin-left:auto;background:var(--accent);color:var(--bg);
+  font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;
+}
+.sb-footer{padding:9px 7px;border-top:1px solid var(--border);}
+.nav-item.logout{color:var(--err);}
+.nav-item.logout:hover{background:rgba(224,92,92,.1);}
+/* ── Main ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{
+  height:52px;flex-shrink:0;
+  background:var(--topbar);border-bottom:1px solid var(--border);
+  backdrop-filter:blur(20px);
+  display:flex;align-items:center;padding:0 22px;gap:11px;
+}
+.tb-title{font-size:13.5px;font-weight:500;color:var(--txt);flex:1;}
+.tb-title span{color:var(--muted);font-weight:300;font-size:12px;}
+.tb-date{font-size:11px;color:var(--muted);}
+.tb-div{width:1px;height:18px;background:var(--border);}
+.theme-toggle{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--adim);border:1px solid var(--border);
+  cursor:pointer;font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .25s;flex-shrink:0;
+}
+.theme-toggle:hover{background:var(--aglow);border-color:var(--accent);transform:rotate(20deg);}
+.content{flex:1;overflow-y:auto;padding:22px;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--adim);border-radius:10px;}
+/* ── Pages ── */
+.page{display:none;}
+.page.active{display:block;animation:pi .25s ease;}
+@keyframes pi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+/* ── Stats ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:13px;margin-bottom:20px;}
+.stat-card{
+  background:var(--panel);border:1px solid var(--border);
+  backdrop-filter:blur(12px);border-radius:var(--r);padding:16px;
+  position:relative;overflow:hidden;
+}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);}
+.stat-card small{font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);}
+.stat-card .val{font-size:28px;font-weight:600;color:var(--accent);margin:4px 0 2px;}
+.stat-card .sub{font-size:10px;color:var(--muted);}
+/* ── Cards ── */
+.card{
+  background:var(--panel);border:1px solid var(--border);
+  backdrop-filter:blur(12px);border-radius:var(--r);padding:20px;margin-bottom:16px;
+}
+.card-title{font-family:'Playfair Display',serif;font-size:16.5px;font-weight:600;color:var(--txt);margin-bottom:3px;}
+.card-sub{font-size:11.5px;color:var(--muted);margin-bottom:16px;}
+/* ── Forms ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
+.span-full{grid-column:1/-1;}
+.field{display:flex;flex-direction:column;gap:4px;}
+.field label{font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);font-weight:500;}
+.field input,.field select{
+  background:var(--adim);border:1px solid var(--border);
+  border-radius:var(--rs);padding:9px 12px;color:var(--txt);
+  font-family:'Inter',sans-serif;font-size:13px;outline:none;
+}
+.field input:focus,.field select:focus{border-color:var(--accent);background:var(--aglow);}
+.field input::placeholder{color:var(--muted);}
+.field select option{background:var(--bg2);color:var(--txt);}
+.btn-row{display:flex;gap:9px;margin-top:14px;flex-wrap:wrap;}
+.btn{
+  padding:9px 17px;border-radius:var(--rs);border:none;cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:12.5px;font-weight:500;
+  transition:all .15s;letter-spacing:.3px;
+}
+.btn-accent{background:var(--accent);color:var(--bg);}
+.btn-accent:hover{opacity:.88;transform:translateY(-1px);box-shadow:0 4px 14px var(--aglow);}
+.btn-ghost{background:var(--adim);color:var(--txt2);border:1px solid var(--border);}
+.btn-ghost:hover{background:var(--aglow);color:var(--txt);}
+.btn-danger{background:rgba(224,92,92,.1);color:var(--err);border:1px solid rgba(224,92,92,.2);}
+.btn-danger:hover{background:rgba(224,92,92,.2);}
+.btn-sm{padding:5px 11px;font-size:11.5px;}
+.btn-xs{padding:4px 9px;font-size:10.5px;}
+/* ── Table ── */
+.tbl-wrap{overflow-x:auto;border-radius:var(--rs);border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;}
+thead th{
+  background:var(--adim);padding:10px 12px;text-align:left;
+  font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--muted);font-weight:500;border-bottom:1px solid var(--border);white-space:nowrap;
+}
+tbody tr{border-bottom:1px solid var(--bsub);transition:background .1s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:var(--adim);}
+tbody td{padding:10px 12px;font-size:12.5px;color:var(--txt2);vertical-align:middle;}
+tbody td:first-child{color:var(--txt);font-weight:500;font-size:12px;}
+/* ── Badges ── */
+.badge{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 9px;border-radius:20px;
+  font-size:9.5px;letter-spacing:.5px;text-transform:uppercase;font-weight:500;white-space:nowrap;
+}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;}
+.badge-available   {background:rgba(76,175,135,.15);color:#4CAF87;}
+.badge-reserved    {background:rgba(91,192,190,.15);color:#5BC0BE;}
+.badge-occupied    {background:rgba(224,160,80,.15); color:#E0A050;}
+.badge-maintenance {background:rgba(224,92,92,.12);  color:#E05C5C;}
+.badge-confirmed   {background:rgba(91,192,190,.15); color:var(--accent);}
+.badge-checked_in  {background:rgba(224,160,80,.15); color:#E0A050;}
+.badge-checked_out {background:rgba(100,130,170,.15);color:#8aacca;}
+.badge-cancelled   {background:rgba(224,92,92,.12);  color:#E05C5C;}
+.badge-admin  {background:var(--adim);color:var(--accent);}
+.badge-staff  {background:rgba(100,140,200,.15);color:#7aaef8;}
+.badge-active {background:rgba(76,175,135,.15);color:#4CAF87;}
+.badge-inactive{background:rgba(224,92,92,.12);color:#E05C5C;}
+/* ── Alert ── */
+.alert{padding:9px 12px;border-radius:var(--rs);font-size:12.5px;margin-bottom:12px;display:none;}
+.alert.error  {background:rgba(224,92,92,.1); color:var(--err); border:1px solid rgba(224,92,92,.25); display:block;}
+.alert.success{background:rgba(76,175,135,.1);color:var(--ok);  border:1px solid rgba(76,175,135,.25);display:block;}
+.alert.warn   {background:rgba(224,160,80,.1);color:var(--warn);border:1px solid rgba(224,160,80,.25);display:block;}
+/* ── Toast ── */
+#toast-box{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:9px;pointer-events:none;}
+.toast{
+  background:var(--bg2);border:1px solid var(--accent);
+  border-left:3px solid var(--accent);border-radius:var(--r);
+  padding:12px 15px;min-width:310px;max-width:430px;
+  box-shadow:var(--shadow);backdrop-filter:blur(20px);
+  animation:tin .35s cubic-bezier(.16,1,.3,1) forwards;
+  pointer-events:all;
+}
+.toast.hiding{animation:tout .3s ease forwards;}
+@keyframes tin{from{opacity:0;transform:translateX(28px) scale(.96)}to{opacity:1;transform:translateX(0) scale(1)}}
+@keyframes tout{from{opacity:1;max-height:200px;padding:12px 15px}to{opacity:0;max-height:0;padding:0;margin:0}}
+.toast-msg{font-size:12.5px;color:var(--txt);line-height:1.55;}
+.toast-msg strong{color:var(--accent);}
+/* ── Room Grid ── */
+.room-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:11px;margin-top:14px;}
+.room-card{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:var(--r);padding:13px;
+  cursor:pointer;transition:all .2s;position:relative;overflow:hidden;
+}
+.room-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 5px 18px var(--aglow);}
+.room-card::before{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;}
+.room-card.available::before {background:var(--ok);}
+.room-card.reserved::before  {background:var(--accent);}
+.room-card.occupied::before  {background:var(--warn);}
+.room-card.maintenance::before{background:var(--err);}
+.r-num{font-size:13.5px;font-weight:600;color:var(--txt);margin-bottom:2px;}
+.r-type{font-size:10.5px;color:var(--muted);margin-bottom:7px;}
+.r-rate{font-size:10.5px;color:var(--accent);margin-bottom:7px;font-weight:500;}
+.r-sel{
+  width:100%;background:var(--adim);border:1px solid var(--border);
+  border-radius:4px;padding:5px 7px;font-size:10.5px;color:var(--txt);
+  font-family:'Inter',sans-serif;cursor:pointer;outline:none;
+}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+.leg-i{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);}
+.leg-dot{width:8px;height:8px;border-radius:50%;}
+/* ── Receipt ── */
+.receipt{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:20px;}
+.rec-head{text-align:center;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.rec-head h2{font-family:'Playfair Display',serif;font-size:19px;color:var(--accent);}
+.rec-head small{font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;}
+.rec-row{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);
+  padding:5px 0;border-bottom:1px solid var(--bsub);}
+.rec-row:last-child{border-bottom:none;}
+.rec-row span:last-child{color:var(--txt);}
+.rec-row.total{
+  border-top:1px solid var(--border);margin-top:7px;padding-top:9px;
+  font-weight:700;font-size:14.5px;border-bottom:none;
+}
+.rec-row.total span:last-child{color:var(--accent);font-size:16px;}
+.rec-foot{text-align:center;margin-top:12px;font-size:10px;color:var(--muted);}
+/* ── Action buttons ── */
+.act-grp{display:flex;gap:4px;flex-wrap:wrap;align-items:center;}
+.btn-ci {background:rgba(76,175,135,.12);color:var(--ok);  border:1px solid rgba(76,175,135,.25);}
+.btn-ci:hover {background:rgba(76,175,135,.22);}
+.btn-co {background:rgba(224,160,80,.12);color:var(--warn);border:1px solid rgba(224,160,80,.25);}
+.btn-co:hover {background:rgba(224,160,80,.22);}
+.btn-inv{background:var(--adim);color:var(--accent);border:1px solid var(--border);}
+.btn-inv:hover{background:var(--aglow);}
+/* ── Modal ── */
+.modal-ov{
+  position:fixed;inset:0;background:rgba(0,0,0,.55);
+  backdrop-filter:blur(4px);
+  display:flex;align-items:center;justify-content:center;
+  z-index:1000;padding:18px;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.modal-ov.open{opacity:1;pointer-events:all;}
+.modal{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:12px;padding:24px;width:100%;max-width:470px;
+  max-height:90vh;overflow-y:auto;
+  transform:translateY(12px);
+  transition:transform .25s cubic-bezier(.16,1,.3,1);
+  box-shadow:var(--shadow);
+}
+.modal-ov.open .modal{transform:translateY(0);}
+.modal h3{font-family:'Playfair Display',serif;font-size:18px;margin-bottom:16px;color:var(--txt);}
+.modal-foot{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;}
+/* ── Help ── */
+.help-sec{margin-bottom:20px;}
+.help-sec h3{font-family:'Playfair Display',serif;font-size:15.5px;color:var(--accent);
+  margin-bottom:7px;display:flex;align-items:center;gap:7px;}
+.help-sec p,.help-sec li{font-size:13px;color:var(--txt2);line-height:1.7;}
+.help-sec ul{padding-left:17px;}
+.help-sec li{margin-bottom:4px;}
+/* ── Print ── */
+@media print{
+  .sidebar,.topbar,.btn-row,.no-print{display:none!important;}
+  body{background:white;color:black;}
+  .receipt{background:white;border:1px solid #ccc;}
+  .rec-head h2,.rec-row.total span:last-child{color:#0077B6;}
+  .rec-row{color:#444;}
+  .rec-row span:last-child{color:#111;}
+}
+</style>
+</head>
+<body>
+<div id="toast-box"></div>
+
+<div class="app">
+  <!-- ══ SIDEBAR (Sequence 6: Help, Exit) ══ -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo">
+        <div class="sb-icon">🏖️</div>
+        <div class="sb-name">Ocean View<br>Resort</div>
+      </div>
+      <div class="sb-sub">Staff Dashboard</div>
+    </div>
+    <div class="sb-user">
+      <div class="user-av" id="user-av">?</div>
+      <div class="user-info">
+        <small id="user-role-lbl">Role</small>
+        <p id="user-name-lbl">Loading…</p>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="nav-lbl">Overview</div>
+      <div class="nav-item active" data-page="bookings" onclick="nav('bookings')">
+        <span class="nav-ico">📋</span> Bookings
+        <span class="nav-badge" id="active-badge">0</span>
+      </div>
+      <div class="nav-lbl">Facilities</div>
+      <div class="nav-item" data-page="rooms" onclick="nav('rooms')">
+        <span class="nav-ico">🏠</span> Room Management
+      </div>
+      <div class="nav-lbl">Management</div>
+      <div class="nav-item admin-only" data-page="staff" onclick="nav('staff')" style="display:none">
+        <span class="nav-ico">👥</span> Staff Accounts
+      </div>
+      <div class="nav-item" data-page="guests" onclick="nav('guests')">
+        <span class="nav-ico">👤</span> Guests
+      </div>
+      <div class="nav-item" data-page="billing" onclick="nav('billing')">
+        <span class="nav-ico">💰</span> Billing / Financials
+      </div>
+      <div class="nav-lbl">Support</div>
+      <!-- Sequence 6 — Help: User → HelpUI: openHelp() → displayGuidelines() -->
+      <div class="nav-item" data-page="help" onclick="nav('help')">
+        <span class="nav-ico">❓</span> Help
+      </div>
+    </nav>
+    <div class="sb-footer">
+      <!-- Sequence 6 — Exit: User → App: exit() → saveAndClose() → closed -->
+      <div class="nav-item logout" onclick="doLogout()">
+        <span class="nav-ico">⏏</span> Logout / Exit
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <div class="main">
+    <div class="topbar">
+      <div class="tb-title" id="tb-title">Live Reservations <span>/ Current Guests</span></div>
+      <span class="tb-date" id="tb-date"></span>
+      <div class="tb-div"></div>
+      <button class="theme-toggle no-print" id="theme-btn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+    </div>
+
+    <div class="content">
+
+      <!-- ═══ BOOKINGS / LIVE RESERVATIONS (Sequences 3, 4) ═══ -->
+      <div id="page-bookings" class="page active">
+        <div class="stats-grid">
+          <div class="stat-card"><small>Total Reservations</small><div class="val" id="s-total">—</div><div class="sub">All time</div></div>
+          <div class="stat-card"><small>Checked In</small><div class="val" id="s-in">—</div><div class="sub">Current guests</div></div>
+          <div class="stat-card"><small>Confirmed</small><div class="val" id="s-conf">—</div><div class="sub">Arriving soon</div></div>
+          <div class="stat-card"><small>Rooms Available</small><div class="val" id="s-avail">—</div><div class="sub">Ready to book</div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">🛎️ Live Reservations / Current Guests</div>
+          <div class="card-sub">Real-time view — confirm check-ins, process check-outs, download invoices</div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr>
+                <th>Res. No.</th><th>Guest</th><th>Email</th>
+                <th>Room</th><th>Check-in</th><th>Check-out</th>
+                <th>Nights</th><th>Total</th><th>Status</th><th>Actions</th>
+              </tr></thead>
+              <tbody id="live-tbl"><tr><td colspan="10" style="text-align:center;padding:28px;color:var(--muted)">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Sequence 3 — Staff Add Reservation -->
+          <div class="card no-print">
+              <div class="card-title">➕ New Reservation</div>
+              <div class="card-sub">Staff → ReservationUI: enterReservationDetails</div>
+              <div id="res-alert" class="alert"></div>
+              <div class="form-grid">
+                  <div class="field"><label>Guest Name <span style="color:var(--err)">*</span></label><input id="r-guest" type="text" placeholder="Full name"></div>
+                  <div class="field"><label>Email <span style="color:var(--err)">*</span></label><input id="r-email" type="email" placeholder="guest@email.com"></div>
+                  <div class="field span-full">
+                      <label>Contact Number <span style="color:var(--err)">*</span></label>
+                      <div style="display:flex;gap:7px">
+                          <select id="r-country" style="flex:0 0 auto;width:210px;background:var(--adim);border:1px solid var(--border);border-radius:var(--rs);padding:9px 10px;color:var(--txt);font-family:'Inter',sans-serif;font-size:12px;outline:none;">
+                              <option value="+94|7|9"  >🇱🇰 Sri Lanka (+94)</option>
+                              <option value="+1|10|10" >🇺🇸 USA / Canada (+1)</option>
+                              <option value="+44|10|10">🇬🇧 UK (+44)</option>
+                              <option value="+91|10|10">🇮🇳 India (+91)</option>
+                              <option value="+61|9|9"  >🇦🇺 Australia (+61)</option>
+                              <option value="+81|10|11">🇯🇵 Japan (+81)</option>
+                              <option value="+49|10|11">🇩🇪 Germany (+49)</option>
+                              <option value="+33|9|9"  >🇫🇷 France (+33)</option>
+                              <option value="+39|9|11" >🇮🇹 Italy (+39)</option>
+                              <option value="+86|11|11">🇨🇳 China (+86)</option>
+                              <option value="+82|9|11" >🇰🇷 South Korea (+82)</option>
+                              <option value="+65|8|8"  >🇸🇬 Singapore (+65)</option>
+                              <option value="+60|9|10" >🇲🇾 Malaysia (+60)</option>
+                              <option value="+66|9|9"  >🇹🇭 Thailand (+66)</option>
+                              <option value="+971|9|9" >🇦🇪 UAE (+971)</option>
+                              <option value="+966|9|9" >🇸🇦 Saudi Arabia (+966)</option>
+                              <option value="+20|10|10">🇪🇬 Egypt (+20)</option>
+                              <option value="+27|9|9"  >🇿🇦 South Africa (+27)</option>
+                              <option value="+234|10|10">🇳🇬 Nigeria (+234)</option>
+                              <option value="+55|10|11">🇧🇷 Brazil (+55)</option>
+                              <option value="+52|10|10">🇲🇽 Mexico (+52)</option>
+                              <option value="+7|10|10" >🇷🇺 Russia (+7)</option>
+                              <option value="+31|9|9"  >🇳🇱 Netherlands (+31)</option>
+                              <option value="+34|9|9"  >🇪🇸 Spain (+34)</option>
+                              <option value="+46|7|9"  >🇸🇪 Sweden (+46)</option>
+                              <option value="+41|9|9"  >🇨🇭 Switzerland (+41)</option>
+                              <option value="+90|10|10">🇹🇷 Turkey (+90)</option>
+                              <option value="+62|9|12" >🇮🇩 Indonesia (+62)</option>
+                              <option value="+63|10|10">🇵🇭 Philippines (+63)</option>
+                              <option value="+92|10|10">🇵🇰 Pakistan (+92)</option>
+                          </select>
+                          <div style="flex:1;position:relative">
+                              <input id="r-phone" type="tel" placeholder="Phone number (digits only)" style="width:100%"
+                                     oninput="this.value=this.value.replace(/[^0-9]/g,'');validatePhone()">
+                              <span id="r-phone-hint" style="position:absolute;right:9px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--muted);pointer-events:none"></span>
+                          </div>
+                      </div>
+                      <div id="r-phone-err" style="font-size:11px;color:var(--err);margin-top:4px;display:none"></div>
+                  </div>
+                  <div class="field">
+                      <label>Room <span style="color:var(--err)">*</span></label>
+                      <select id="r-room"><option value="">— Select Available Room —</option></select>
+                  </div>
+                  <div class="field"><label>Check-in Date <span style="color:var(--err)">*</span></label><input id="r-checkin" type="date"></div>
+                  <div class="field"><label>Check-out Date <span style="color:var(--err)">*</span></label><input id="r-checkout" type="date"></div>
+              </div>
+              <div class="btn-row">
+                  <button class="btn btn-accent" onclick="addReservation()">Confirm Reservation</button>
+              </div>
+          </div>
+      </div>
+
+      <!-- ═══ ROOM MANAGEMENT ═══ -->
+      <div id="page-rooms" class="page">
+        <div class="card">
+          <div class="card-title">🏠 Room Status Overview</div>
+          <div class="card-sub">Live status of all resort rooms — update via dropdown</div>
+          <div class="legend">
+            <div class="leg-i"><div class="leg-dot" style="background:var(--ok)"></div>Available</div>
+            <div class="leg-i"><div class="leg-dot" style="background:var(--accent)"></div>Reserved</div>
+            <div class="leg-i"><div class="leg-dot" style="background:var(--warn)"></div>Occupied</div>
+            <div class="leg-i"><div class="leg-dot" style="background:var(--err)"></div>Maintenance</div>
+          </div>
+          <div class="room-grid" id="room-grid"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">📋 Room Detail Table</div>
+          <div class="card-sub">Full inventory with manual status control</div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Room</th><th>Type</th><th>Rate/Night</th><th>Status</th><th>Update</th></tr></thead>
+              <tbody id="room-tbl"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ STAFF ACCOUNTS (Sequence 2 — Admin CRUD) ═══ -->
+      <div id="page-staff" class="page">
+        <div class="card no-print">
+          <div class="card-title">👤 Create Staff Account</div>
+          <div class="card-sub">Admin → AdminUI: selectManageStaff() → [Create Staff]</div>
+          <div id="staff-form-alert" class="alert"></div>
+          <div class="form-grid">
+            <div class="field"><label>Full Name</label><input id="s-name" type="text" placeholder="Full name"></div>
+            <div class="field"><label>Username</label><input id="s-user" type="text" placeholder="username"></div>
+            <div class="field"><label>Password</label><input id="s-pass" type="password" placeholder="Password"></div>
+            <div class="field"><label>Email</label><input id="s-email" type="email" placeholder="staff@resort.com"></div>
+            <div class="field"><label>Role</label>
+              <select id="s-role"><option value="staff">Staff</option><option value="admin">Admin</option></select>
+            </div>
+          </div>
+          <div class="btn-row"><button class="btn btn-accent" onclick="createStaff()">Create Account</button></div>
+        </div>
+        <div class="card">
+          <div class="card-title">👥 Staff Directory</div>
+          <div class="card-sub">[View Staff] — all registered users</div>
+          <div id="staff-tbl-alert" class="alert"></div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>ID</th><th>Name</th><th>Username</th><th>Role</th><th>Email</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="staff-tbl"><tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ GUESTS ═══ -->
+      <div id="page-guests" class="page">
+        <div class="card">
+          <div class="card-title">👤 Guest Roster</div>
+          <div class="card-sub">All reservations — complete guest history</div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Res. No.</th><th>Guest</th><th>Email</th><th>Room</th><th>Check-in</th><th>Check-out</th><th>Nights</th><th>Total</th><th>Status</th></tr></thead>
+              <tbody id="guest-tbl"><tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted)">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ BILLING (Sequences 4: calculateBill, printBill) ═══ -->
+      <div id="page-billing" class="page">
+        <div class="card no-print">
+          <div class="card-title">💰 Billing & Financials</div>
+          <div class="card-sub">Staff → BillingUI: enterReservationNo → BillingService.calculateBill</div>
+          <div id="billing-alert" class="alert"></div>
+          <div class="form-grid">
+            <div class="field"><label>Reservation Number</label>
+              <input id="b-resno" type="text" placeholder="e.g. RES-20250301-001">
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-accent" onclick="calcBill()">Calculate Bill</button>
+            <button class="btn btn-ghost no-print" id="print-btn" onclick="printBill()" style="display:none">🖨 Print Bill</button>
+            <button class="btn btn-ghost no-print" id="pdf-btn" onclick="downloadPDF()" style="display:none">⬇ Download PDF</button>
+          </div>
+        </div>
+        <div id="receipt-area" style="display:none">
+          <div class="receipt" id="receipt">
+            <div class="rec-head">
+              <h2>🏖️ Ocean View Resort</h2>
+              <small>Galle, Sri Lanka · Official Invoice</small>
+            </div>
+            <div id="receipt-rows"></div>
+            <div class="rec-foot">Thank you for staying with Ocean View Resort · reservations@oceanviewgalle.lk</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ HELP (Sequence 6 — displayGuidelines) ═══ -->
+      <div id="page-help" class="page">
+        <div class="card">
+          <div class="card-title">Help & System Guidelines</div>
+          <div class="card-sub">HelpUI → User: displayGuidelines()</div>
+
+          <div class="help-sec">
+            <h3>📋 Bookings / Live Reservations</h3>
+            <ul>
+              <li><strong>Confirm Check-in</strong> — marks guest as Checked In, room becomes Occupied. A toast confirmation email notification appears.</li>
+              <li><strong>Process Check-out</strong> — marks guest as Checked Out, room returns to Available.</li>
+              <li><strong>Download Invoice</strong> — generates a branded PDF invoice for the guest.</li>
+              <li><strong>New Reservation</strong> — fill all fields; the system checks for room conflicts automatically.</li>
+            </ul>
+          </div>
+          <div class="help-sec">
+            <h3>🏠 Room Management</h3>
+            <ul>
+              <li>Rooms: <strong>Available</strong>, <strong>Reserved</strong>, <strong>Occupied</strong>, <strong>Maintenance</strong>.</li>
+              <li>Maintenance rooms cannot be booked — excluded from reservation dropdown.</li>
+              <li>Status syncs automatically on check-in / check-out / cancellation.</li>
+            </ul>
+          </div>
+          <div class="help-sec">
+            <h3>👥 Staff Accounts <em style="font-size:11px;color:var(--muted)">(Admin Only)</em></h3>
+            <ul>
+              <li><strong>Create</strong> — fill all fields, click Create Account → StaffDB.save.</li>
+              <li><strong>Edit</strong> — click ✏️ to update name, email, role, status, or password.</li>
+              <li><strong>Delete</strong> — click 🗑, confirm the deletion prompt → StaffDB.delete.</li>
+            </ul>
+          </div>
+          <div class="help-sec">
+            <h3>💰 Billing (Sequence 4)</h3>
+            <ul>
+              <li>Enter a reservation number → BillingService.calculateBill → shows nights, rate, VAT (12%), total.</li>
+              <li>Click <strong>Print Bill</strong> (browser print) → printBill(resNo) → printSuccess().</li>
+              <li>Click <strong>Download PDF</strong> for a branded invoice.</li>
+            </ul>
+          </div>
+          <div class="help-sec">
+            <h3>🌙/☀️ Theme Toggle</h3>
+            <p>Click the sun/moon icon in the top-right to switch between <strong>Dark "Midnight Abyss"</strong> and <strong>Light "Luminous Ocean"</strong>. Preference persists in localStorage.</p>
+          </div>
+          <div class="help-sec">
+            <h3>⏏ Logout / Exit</h3>
+            <p>App.exit() → App.saveAndClose() → session cleared → redirect to login. Click the Logout button at the bottom of the sidebar.</p>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ── Edit Staff Modal (Sequence 2 — Update Staff) ── -->
+<div id="modal-staff" class="modal-ov">
+  <div class="modal">
+    <h3>Edit Staff Account</h3>
+    <div id="modal-staff-alert" class="alert"></div>
+    <input type="hidden" id="m-id">
+    <div class="form-grid">
+      <div class="field"><label>Full Name</label><input id="m-name" type="text"></div>
+      <div class="field"><label>Username</label><input id="m-user" type="text"></div>
+      <div class="field"><label>Email</label><input id="m-email" type="email"></div>
+      <div class="field"><label>Role</label>
+        <select id="m-role"><option value="staff">Staff</option><option value="admin">Admin</option></select>
+      </div>
+      <div class="field"><label>Status</label>
+        <select id="m-status"><option value="active">Active</option><option value="inactive">Inactive</option></select>
+      </div>
+      <div class="field span-full">
+        <label>New Password (leave blank to keep)</label>
+        <input id="m-pass" type="password" placeholder="New password">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modal-staff')">Cancel</button>
+      <button class="btn btn-accent" onclick="saveStaff()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Update Reservation Status Modal ── -->
+<div id="modal-res" class="modal-ov">
+  <div class="modal">
+    <h3>Update Reservation Status</h3>
+    <input type="hidden" id="mr-resno">
+    <div class="field"><label>New Status</label>
+      <select id="mr-status">
+        <option value="confirmed">Confirmed</option>
+        <option value="checked_in">Checked In</option>
+        <option value="checked_out">Checked Out</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modal-res')">Cancel</button>
+      <button class="btn btn-accent" onclick="saveResStatus()">Update</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:8080/api';
+
+/* ═════════════════════════════════════════
+   THEME (persisted in localStorage)
+═════════════════════════════════════════ */
+const htmlEl   = document.getElementById('html-root');
+const themeBtn = document.getElementById('theme-btn');
+
+function applyTheme(t) {
+  htmlEl.setAttribute('data-theme', t);
+  themeBtn.textContent = t === 'dark' ? '🌙' : '☀️';
+  localStorage.setItem('hotel-theme', t);
+}
+(function() { applyTheme(localStorage.getItem('hotel-theme') || 'dark'); })();
+function toggleTheme() {
+  applyTheme(htmlEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+}
+
+/* ═════════════════════════════════════════
+   SESSION  (Sequence 1 — showMainMenu)
+═════════════════════════════════════════ */
+let USER = JSON.parse(sessionStorage.getItem('user') || 'null');
+if (!USER) window.location.href = 'index.html';
+
+document.getElementById('user-name-lbl').textContent = USER.fullName;
+document.getElementById('user-role-lbl').textContent = USER.role.toUpperCase();
+document.getElementById('user-av').textContent =
+  USER.fullName.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+if (USER.role === 'admin')
+  document.querySelectorAll('.admin-only').forEach(e => e.style.display='flex');
+
+document.getElementById('tb-date').textContent =
+  new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+/* ═════════════════════════════════════════
+   TOAST
+═════════════════════════════════════════ */
+function showToast(msg, ms=5500) {
+  const tc = document.getElementById('toast-box');
+  const t  = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = `<div class="toast-msg">✅ ${msg}</div>`;
+  tc.appendChild(t);
+  setTimeout(() => {
+    t.classList.add('hiding');
+    setTimeout(() => t.remove(), 320);
+  }, ms);
+}
+
+/* ═════════════════════════════════════════
+   NAVIGATION (Sequence 6 — openHelp)
+═════════════════════════════════════════ */
+const TITLES = {
+  bookings:'Live Reservations <span>/ Current Guests</span>',
+  rooms:   'Room Management <span>/ Status</span>',
+  staff:   'Staff Accounts',
+  guests:  'Guests <span>/ All Reservations</span>',
+  billing: 'Billing <span>/ Financials</span>',
+  help:    'Help <span>/ Guidelines</span>',
+};
+function nav(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelector(`[data-page="${page}"]`).classList.add('active');
+  document.getElementById('tb-title').innerHTML = TITLES[page] || page;
+  if (page==='bookings') loadBookings();
+  if (page==='rooms')    loadRooms();
+  if (page==='staff')    loadStaff();
+  if (page==='guests')   loadGuests();
+  // Sequence 6: HelpUI → displayGuidelines() — static HTML already rendered
+}
+
+/* ═════════════════════════════════════════
+   HELPERS
+═════════════════════════════════════════ */
+const fmt = v => 'LKR ' + parseFloat(v).toLocaleString('en-LK',{minimumFractionDigits:2});
+function badge(val) { return `<span class="badge badge-${val}">${val.replace(/_/g,' ')}</span>`; }
+function showAlert(id, type, msg) {
+  const el = document.getElementById(id);
+  el.className='alert '+type; el.textContent=msg;
+  setTimeout(()=>{el.className='alert';},5000);
+}
+async function apiCall(path, opts={}) {
+  const r = await fetch(API+path, {headers:{'Content-Type':'application/json'},...opts});
+  return r.json();
+}
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-ov').forEach(o =>
+  o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); }));
+function esc(s) { return (s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+
+/* ═════════════════════════════════════════
+   BOOKINGS (Sequence 3: loadReservations)
+═════════════════════════════════════════ */
+let cachedReservations = [];
+
+async function loadBookings() {
+  try {
+    const [resData, roomData] = await Promise.all([
+      apiCall('/reservations'), apiCall('/rooms')
+    ]);
+    cachedReservations = resData.reservations || [];
+    const rooms = roomData.rooms || [];
+
+    // Update stats
+    const ci   = cachedReservations.filter(r=>r.status==='checked_in').length;
+    const conf = cachedReservations.filter(r=>r.status==='confirmed').length;
+    const avail= rooms.filter(r=>r.status==='available').length;
+    document.getElementById('s-total').textContent  = cachedReservations.length;
+    document.getElementById('s-in').textContent     = ci;
+    document.getElementById('s-conf').textContent   = conf;
+    document.getElementById('s-avail').textContent  = avail;
+    document.getElementById('active-badge').textContent = ci;
+
+    renderLiveTable(cachedReservations);
+    populateRoomSelector(rooms);
+  } catch(e) {
+    document.getElementById('live-tbl').innerHTML =
+      `<tr><td colspan="10" style="text-align:center;padding:28px;color:var(--muted)">Cannot connect to backend. Is it running?</td></tr>`;
+  }
+}
+
+function renderLiveTable(list) {
+  if (!list.length) {
+    document.getElementById('live-tbl').innerHTML =
+      `<tr><td colspan="10" style="text-align:center;padding:28px;color:var(--muted)">No reservations yet.</td></tr>`;
+    return;
+  }
+  document.getElementById('live-tbl').innerHTML = list.map(r => `
+    <tr>
+      <td>${r.resNo}</td>
+      <td>${r.guestName}</td>
+      <td style="font-size:11px;color:var(--muted)">${r.guestEmail||'—'}</td>
+      <td>${r.roomId} <span style="font-size:10px;color:var(--muted)">${r.roomType}</span></td>
+      <td>${r.checkIn}</td><td>${r.checkOut}</td><td>${r.nights}</td>
+      <td>${fmt(r.total)}</td>
+      <td>${badge(r.status)}</td>
+      <td>
+        <div class="act-grp">
+          ${r.status==='confirmed'  ? `<button class="btn btn-xs btn-ci"  onclick="confirmCheckin('${r.resNo}','${esc(r.guestName)}','${esc(r.guestEmail||'')}')">✅ Check-in</button>`  : ''}
+          ${r.status==='checked_in' ? `<button class="btn btn-xs btn-co"  onclick="processCheckout('${r.resNo}','${esc(r.guestName)}','${esc(r.guestEmail||'')}')">🔑 Check-out</button>` : ''}
+          <button class="btn btn-xs btn-inv" onclick="downloadInvoice('${r.resNo}')">📄 Invoice</button>
+          ${!['checked_out','cancelled'].includes(r.status) ?
+            `<button class="btn btn-xs btn-ghost" onclick="openResModal('${r.resNo}','${r.status}')">✏️</button>` : ''}
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+/* ── Confirm Check-in (Sequence 3 status update) ── */
+async function confirmCheckin(resNo, guestName, guestEmail) {
+  try {
+    const d = await apiCall('/reservations/'+resNo, {
+      method:'PUT', body: JSON.stringify({status:'checked_in'})
+    });
+    if (d.success) {
+      // Toast: "✅ Success: A confirmation email for [Guest Name + email] has been generated and sent"
+      showToast(`<strong>Success:</strong> A confirmation email for <strong>${guestName}</strong> (${guestEmail}) has been generated and sent to the guest's profile.`);
+      loadBookings();
+    }
+  } catch(e) { alert('Connection error.'); }
+}
+
+/* ── Process Check-out ── */
+async function processCheckout(resNo, guestName, guestEmail) {
+  try {
+    const d = await apiCall('/reservations/'+resNo, {
+      method:'PUT', body: JSON.stringify({status:'checked_out'})
+    });
+    if (d.success) {
+      showToast(`<strong>Success:</strong> A confirmation email for <strong>${guestName}</strong> (${guestEmail}) has been generated and sent to the guest's profile.`);
+      loadBookings();
+    }
+  } catch(e) { alert('Connection error.'); }
+}
+
+
+function populateRoomSelector(rooms) {
+  const sel = document.getElementById('r-room');
+  sel.innerHTML = '<option value="">— Select Available Room —</option>';
+  rooms.filter(r => r.status==='available').forEach(r => {
+    const o = document.createElement('option');
+    o.value = r.id;
+    o.textContent = `Room ${r.roomNumber} · ${r.roomType} — ${fmt(r.ratePerNight)}/night`;
+    sel.appendChild(o);
+  });
+}
+
+/* ── Phone validation helper ── */
+function getPhoneRule() {
+  const raw = document.getElementById('r-country').value; // "+94|7|9"
+  const [code, min, max] = raw.split('|');
+  return { code, min: parseInt(min), max: parseInt(max) };
+}
+function validatePhone() {
+  const phoneEl = document.getElementById('r-phone');
+  const phone   = phoneEl.value;
+  const { min, max } = getPhoneRule();
+  const errEl  = document.getElementById('r-phone-err');
+  const hint   = document.getElementById('r-phone-hint');
+  hint.textContent = phone.length + '/' + max;
+  phoneEl.classList.remove('input-ok','input-err');
+  if (phone.length === 0) { errEl.style.display='none'; return true; }
+  if (phone.length < min) {
+    errEl.textContent = `Too short — minimum ${min} digits for this country.`;
+    errEl.style.display = 'block';
+    phoneEl.classList.add('input-err');
+    return false;
+  }
+  if (phone.length > max) {
+    errEl.textContent = `Too long — maximum ${max} digits for this country.`;
+    errEl.style.display = 'block';
+    phoneEl.classList.add('input-err');
+    return false;
+  }
+  errEl.style.display = 'none';
+  phoneEl.classList.add('input-ok');
+  return true;
+}
+document.getElementById('r-country').addEventListener('change', () => {
+  document.getElementById('r-phone').value = '';
+  document.getElementById('r-phone-hint').textContent = '';
+  document.getElementById('r-phone-err').style.display = 'none';
+});
+
+/* ── Add Reservation (Sequence 3: addReservation) ── */
+async function addReservation() {
+  const guestName = document.getElementById('r-guest').value.trim();
+  const email     = document.getElementById('r-email').value.trim();
+  const phone     = document.getElementById('r-phone').value.trim();
+  const roomId    = document.getElementById('r-room').value;
+  const checkIn   = document.getElementById('r-checkin').value;
+  const checkOut  = document.getElementById('r-checkout').value;
+
+  // ── Mandatory field checks ──
+  if (!guestName)
+    return showAlert('res-alert','error','Guest Name is required.');
+  if (guestName.length < 2)
+    return showAlert('res-alert','error','Guest Name must be at least 2 characters.');
+  if (!email)
+    return showAlert('res-alert','error','Email address is required.');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    return showAlert('res-alert','error','Please enter a valid email address.');
+  if (!phone)
+    return showAlert('res-alert','error','Contact number is required.');
+  if (!validatePhone())
+    return showAlert('res-alert','error',document.getElementById('r-phone-err').textContent);
+  if (!roomId)
+    return showAlert('res-alert','error','Please select a room.');
+  if (!checkIn)
+    return showAlert('res-alert','error','Check-in date is required.');
+  if (!checkOut)
+    return showAlert('res-alert','error','Check-out date is required.');
+  if (checkIn >= checkOut)
+    return showAlert('res-alert','error','Check-out date must be after check-in date.');
+
+  const today = new Date().toISOString().slice(0,10);
+  if (checkIn < today)
+    return showAlert('res-alert','error','Check-in date cannot be in the past.');
+
+  const { code } = getPhoneRule();
+  const guestContact = code + ' ' + phone;
+
+  const payload = { guestName, guestEmail: email, guestContact, roomId, checkIn, checkOut, createdBy: USER.id };
+  try {
+    const d = await apiCall('/reservations',{method:'POST',body:JSON.stringify(payload)});
+    if (d.success) {
+      showAlert('res-alert','success', `✅ Reservation ${d.resNo} confirmed! Total: ${fmt(d.total)}`);
+      ['r-guest','r-email','r-phone','r-checkin','r-checkout'].forEach(id=>document.getElementById(id).value='');
+      document.getElementById('r-room').value='';
+      document.getElementById('r-phone-hint').textContent='';
+      document.getElementById('r-phone-err').style.display='none';
+      loadBookings();
+    } else if (d.conflict) {
+      showAlert('res-alert','warn', d.message);
+    } else {
+      showAlert('res-alert','error', d.message);
+    }
+  } catch(e) { showAlert('res-alert','error','Connection error.'); }
+}
+
+/* ── Reservation Status Modal ── */
+function openResModal(resNo, status) {
+  document.getElementById('mr-resno').value  = resNo;
+  document.getElementById('mr-status').value = status;
+  openModal('modal-res');
+}
+async function saveResStatus() {
+  const resNo  = document.getElementById('mr-resno').value;
+  const status = document.getElementById('mr-status').value;
+  try {
+    await apiCall('/reservations/'+resNo,{method:'PUT',body:JSON.stringify({status})});
+    closeModal('modal-res');
+    loadBookings();
+  } catch(e) { alert('Connection error.'); }
+}
+
+/* ═════════════════════════════════════════
+   ROOM MANAGEMENT
+═════════════════════════════════════════ */
+async function loadRooms() {
+  try {
+    const d = await apiCall('/rooms');
+    renderRoomGrid(d.rooms||[]);
+    renderRoomTable(d.rooms||[]);
+  } catch(e) {
+    document.getElementById('room-grid').innerHTML = `<p style="color:var(--muted)">Cannot connect to backend.</p>`;
+  }
+}
+
+function renderRoomGrid(rooms) {
+  document.getElementById('room-grid').innerHTML = rooms.map(r => `
+    <div class="room-card ${r.status}">
+      <div class="r-num">Room ${r.roomNumber}</div>
+      <div class="r-type">${r.roomType}</div>
+      <div class="r-rate">${fmt(r.ratePerNight)}/night</div>
+      <select class="r-sel" onchange="updateRoomStatus('${r.id}',this.value)">
+        <option value="available"   ${r.status==='available'   ?'selected':''}>Available</option>
+        <option value="reserved"    ${r.status==='reserved'    ?'selected':''}>Reserved</option>
+        <option value="occupied"    ${r.status==='occupied'    ?'selected':''}>Occupied</option>
+        <option value="maintenance" ${r.status==='maintenance' ?'selected':''}>Maintenance</option>
+      </select>
+    </div>`).join('');
+}
+
+function renderRoomTable(rooms) {
+  document.getElementById('room-tbl').innerHTML = rooms.map(r => `
+    <tr>
+      <td>Room ${r.roomNumber}</td>
+      <td>${r.roomType}</td>
+      <td>${fmt(r.ratePerNight)}</td>
+      <td>${badge(r.status)}</td>
+      <td>
+        <select class="field" style="padding:5px 8px;font-size:11px" onchange="updateRoomStatus('${r.id}',this.value)">
+          <option value="available"   ${r.status==='available'   ?'selected':''}>Available</option>
+          <option value="reserved"    ${r.status==='reserved'    ?'selected':''}>Reserved</option>
+          <option value="occupied"    ${r.status==='occupied'    ?'selected':''}>Occupied</option>
+          <option value="maintenance" ${r.status==='maintenance' ?'selected':''}>Maintenance</option>
+        </select>
+      </td>
+    </tr>`).join('');
+}
+
+async function updateRoomStatus(roomId, status) {
+  try {
+    await apiCall('/rooms/'+roomId,{method:'PUT',body:JSON.stringify({status})});
+    loadRooms();
+  } catch(e) { alert('Connection error.'); }
+}
+
+/* ═════════════════════════════════════════
+   GUESTS
+═════════════════════════════════════════ */
+async function loadGuests() {
+  try {
+    const d = await apiCall('/reservations');
+    const list = d.reservations || [];
+    document.getElementById('guest-tbl').innerHTML = list.length ?
+      list.map(r => `
+        <tr>
+          <td>${r.resNo}</td><td>${r.guestName}</td>
+          <td style="font-size:11px;color:var(--muted)">${r.guestEmail||'—'}</td>
+          <td>${r.roomId}</td><td>${r.checkIn}</td><td>${r.checkOut}</td>
+          <td>${r.nights}</td><td>${fmt(r.total)}</td><td>${badge(r.status)}</td>
+        </tr>`).join('') :
+      `<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted)">No reservations yet.</td></tr>`;
+  } catch(e) {
+    document.getElementById('guest-tbl').innerHTML =
+      `<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted)">Cannot connect to backend.</td></tr>`;
+  }
+}
+
+/* ═════════════════════════════════════════
+   STAFF CRUD (Sequence 2)
+═════════════════════════════════════════ */
+async function loadStaff() {
+  try {
+    const d = await apiCall('/staff');
+    const list = d.staff || [];
+    document.getElementById('staff-tbl').innerHTML = list.length ?
+      list.map(s => `
+        <tr>
+          <td>${s.id}</td><td>${s.fullName}</td><td>${s.username}</td>
+          <td>${badge(s.role)}</td>
+          <td style="font-size:11px">${s.email||'—'}</td>
+          <td>${badge(s.status)}</td>
+          <td>
+            <button class="btn btn-ghost btn-sm" onclick="openEditStaff(${s.id}, '${esc(s.fullName)}', '${esc(s.username)}', '${esc(s.email||'')}', '${s.role}', '${s.status}')">✏️ Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteStaff(${s.id},'${esc(s.fullName)}')">🗑</button>
+          </td>
+        </tr>`).join('') :
+      `<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">No staff found.</td></tr>`;
+  } catch(e) {
+    document.getElementById('staff-tbl').innerHTML =
+      `<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">Cannot connect to backend.</td></tr>`;
+  }
+}
+
+/* [Create Staff] StaffService → StaffDB.save(staffData) → showSuccess() */
+async function createStaff() {
+  const payload = {
+    fullName: document.getElementById('s-name').value.trim(),
+    username: document.getElementById('s-user').value.trim(),
+    password: document.getElementById('s-pass').value.trim(),
+    email:    document.getElementById('s-email').value.trim(),
+    role:     document.getElementById('s-role').value,
+  };
+  if (!payload.fullName||!payload.username||!payload.password)
+    return showAlert('staff-form-alert','error','Name, username and password are required.');
+  try {
+    const d = await apiCall('/staff',{method:'POST',body:JSON.stringify(payload)});
+    if (d.success) { // showSuccess()
+      showAlert('staff-form-alert','success', d.message);
+      ['s-name','s-user','s-pass','s-email'].forEach(id=>document.getElementById(id).value='');
+      loadStaff();
+    } else { showAlert('staff-form-alert','error', d.message); }
+  } catch(e) { showAlert('staff-form-alert','error','Connection error.'); }
+}
+
+/* [Update Staff] */
+function openEditStaff(id, name, username, email, role, status) {
+  document.getElementById('m-id').value     = id;
+  document.getElementById('m-name').value   = name;
+  document.getElementById('m-user').value   = username;
+  document.getElementById('m-email').value  = email;
+  document.getElementById('m-role').value   = role;
+  document.getElementById('m-status').value = status;
+  document.getElementById('m-pass').value   = '';
+  document.getElementById('modal-staff-alert').className = 'alert';
+  openModal('modal-staff');
+}
+async function saveStaff() {
+  const id = document.getElementById('m-id').value;
+  const payload = {
+    fullName: document.getElementById('m-name').value.trim(),
+    username: document.getElementById('m-user').value.trim(),
+    email:    document.getElementById('m-email').value.trim(),
+    role:     document.getElementById('m-role').value,
+    status:   document.getElementById('m-status').value,
+    password: document.getElementById('m-pass').value.trim(),
+  };
+  try {
+    const d = await apiCall('/staff/'+id,{method:'PUT',body:JSON.stringify(payload)});
+    if (d.success) { // showSuccess() → updated
+      showAlert('modal-staff-alert','success', d.message);
+      setTimeout(()=>{closeModal('modal-staff');loadStaff();},700);
+    } else { showAlert('modal-staff-alert','error', d.message); }
+  } catch(e) { showAlert('modal-staff-alert','error','Connection error.'); }
+}
+
+/* [Delete Staff] opt confirmDelete → StaffDB.delete → showDeleted() */
+async function deleteStaff(id, name) {
+  if (!confirm(`Delete staff account for "${name}"?\nThis cannot be undone.`)) return; // confirmDelete()
+  try {
+    const d = await apiCall('/staff/'+id,{method:'DELETE'});
+    if (d.success) { // showDeleted()
+      showAlert('staff-tbl-alert','success', d.message);
+      loadStaff();
+    } else { showAlert('staff-tbl-alert','error', d.message); }
+  } catch(e) { showAlert('staff-tbl-alert','error','Connection error.'); }
+}
+
+/* ═════════════════════════════════════════
+   BILLING (Sequence 4)
+   Staff → BillingUI → BillingService.calculateBill(resNo)
+═════════════════════════════════════════ */
+let currentBill = null;
+
+async function calcBill() {
+  const resNo = document.getElementById('b-resno').value.trim().toUpperCase();
+  if (!resNo) return showAlert('billing-alert','error','Enter a reservation number.');
+  try {
+    // BillingUI → BillingService: calculateBill(resNo)
+    const d = await apiCall('/billing/'+resNo);
+    if (!d.success) { // [not found] showNotFound()
+      showAlert('billing-alert','error', d.message);
+      document.getElementById('receipt-area').style.display='none';
+      return;
+    }
+    // [found] showBill(total)
+    currentBill = d;
+    renderReceipt(d);
+    document.getElementById('receipt-area').style.display='block';
+    document.getElementById('print-btn').style.display='';
+    document.getElementById('pdf-btn').style.display='';
+  } catch(e) { showAlert('billing-alert','error','Connection error.'); }
+}
+
+function renderReceipt(d) {
+  const rows = [
+    ['Reservation No.', d.resNo],
+    ['Guest Name',      d.guestName],
+    ['Email',           d.guestEmail||'—'],
+    ['Contact',         d.guestContact||'—'],
+    ['Room',            d.roomId + ' · ' + d.roomType],
+    ['Check-in',        d.checkIn],
+    ['Check-out',       d.checkOut],
+    ['Nights',          d.nights],
+    ['Rate / Night',    fmt(d.ratePerNight)],
+    ['Subtotal',        fmt(d.subtotal)],
+    ['VAT (12%)',       fmt(d.tax)],
+  ];
+  document.getElementById('receipt-rows').innerHTML =
+    rows.map(([k,v])=>`<div class="rec-row"><span>${k}</span><span>${v}</span></div>`).join('')+
+    `<div class="rec-row total"><span>TOTAL AMOUNT DUE</span><span>${fmt(d.total)}</span></div>`+
+    `<div class="rec-row"><span>Status</span><span>${d.status.replace(/_/g,' ').toUpperCase()}</span></div>`;
+}
+
+/* Sequence 4 opt: clickPrint → printBill(resNo) → printSuccess() */
+async function printBill() {
+  const resNo = document.getElementById('b-resno').value.trim().toUpperCase();
+  try {
+    // BillingUI → BillingService: printBill(resNo)
+    await apiCall('/billing/print/'+resNo,{method:'POST'});
+    window.print(); // printSuccess()
+  } catch(e) { window.print(); }
+}
+
+function downloadPDF()     { if(currentBill) genPDF(currentBill); }
+function downloadInvoice(resNo) {
+  const r = cachedReservations.find(r=>r.resNo===resNo);
+  if (r) genPDF(r);
+  else   apiCall('/billing/'+resNo).then(d=>{ if(d.success) genPDF(d); });
+}
+
+/* ═════════════════════════════════════════
+   PDF INVOICE GENERATOR (jsPDF, browser)
+═════════════════════════════════════════ */
+function genPDF(res) {
+  if (typeof window.jspdf === 'undefined') { alert('PDF library loading, try again.'); return; }
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF({unit:'mm',format:'a4'});
+  const W=210, L=20, R=190;
+
+  doc.setFillColor(11,19,43); doc.rect(0,0,W,58,'F');
+
+  doc.setTextColor(91,192,190); doc.setFont('helvetica','bold'); doc.setFontSize(22);
+  doc.text('OCEAN VIEW RESORT', L, 20);
+  doc.setTextColor(189,195,199); doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
+  doc.text('Unawatuna Beach Road, Galle, Southern Province, Sri Lanka 80000', L, 29);
+  doc.text('reservations@oceanviewgalle.lk  ·  +94 91 222 4567', L, 36);
+
+  doc.setTextColor(91,192,190); doc.setFont('helvetica','bold'); doc.setFontSize(16);
+  doc.text('INVOICE', R, 22, {align:'right'});
+  doc.setTextColor(189,195,199); doc.setFont('helvetica','normal'); doc.setFontSize(9);
+  doc.text(res.resNo||'', R, 30, {align:'right'});
+  doc.text('Date: '+new Date().toLocaleDateString('en-GB'), R, 37, {align:'right'});
+
+  let y=68;
+  doc.setFillColor(28,37,65);
+  doc.roundedRect(L,y,82,44,2,2,'F');
+  doc.roundedRect(110,y,80,44,2,2,'F');
+
+  doc.setTextColor(91,192,190); doc.setFont('helvetica','bold'); doc.setFontSize(8);
+  doc.text('BILLED TO', L+5, y+8);
+  doc.setTextColor(240,240,240); doc.setFont('helvetica','bold'); doc.setFontSize(12);
+  doc.text(res.guestName||'', L+5, y+17);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(189,195,199);
+  doc.text(res.guestEmail||'', L+5, y+25);
+  doc.text(res.guestContact||'', L+5, y+32);
+
+  doc.setTextColor(91,192,190); doc.setFont('helvetica','bold'); doc.setFontSize(8);
+  doc.text('STAY DETAILS', 115, y+8);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(189,195,199);
+  doc.text('Room: '+(res.roomId||''), 115, y+17);
+  doc.text('Type: '+(res.roomType||''), 115, y+24);
+  doc.text('Check-in:  '+(res.checkIn||''), 115, y+31);
+  doc.text('Check-out: '+(res.checkOut||'')+'  ('+res.nights+' nights)', 115, y+38);
+
+  y+=56;
+  doc.setFillColor(91,192,190); doc.rect(L,y,R-L,10,'F');
+  doc.setTextColor(11,19,43); doc.setFont('helvetica','bold'); doc.setFontSize(9);
+  doc.text('DESCRIPTION', L+4, y+7);
+  doc.text('NIGHTS', 132, y+7, {align:'center'});
+  doc.text('RATE', 158, y+7, {align:'center'});
+  doc.text('AMOUNT', R-4, y+7, {align:'right'});
+  y+=14;
+
+  doc.setFillColor(20,30,55); doc.rect(L,y-4,R-L,13,'F');
+  doc.setTextColor(240,240,240); doc.setFont('helvetica','normal'); doc.setFontSize(10);
+  doc.text(res.roomType||'', L+4, y+4);
+  doc.text(String(res.nights), 132, y+4, {align:'center'});
+  doc.text(fP(res.ratePerNight), 158, y+4, {align:'center'});
+  doc.text(fP(res.subtotal), R-4, y+4, {align:'right'});
+  y+=18;
+
+  const sx=120;
+  doc.setFillColor(20,30,55); doc.rect(sx,y,R-sx,38,'F');
+  doc.setTextColor(189,195,199); doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
+  doc.text('Subtotal', sx+4, y+10);
+  doc.setTextColor(240,240,240); doc.setFont('helvetica','bold');
+  doc.text(fP(res.subtotal), R-4, y+10, {align:'right'});
+  doc.setFont('helvetica','normal'); doc.setTextColor(189,195,199);
+  doc.text('VAT (12%)', sx+4, y+20);
+  doc.setTextColor(240,240,240); doc.setFont('helvetica','bold');
+  doc.text(fP(res.tax), R-4, y+20, {align:'right'});
+  doc.setFillColor(91,192,190); doc.rect(sx,y+25,R-sx,.6,'F');
+  doc.setFontSize(12); doc.setTextColor(91,192,190);
+  doc.text('TOTAL DUE', sx+4, y+34);
+  doc.setFontSize(14); doc.text(fP(res.total), R-4, y+34, {align:'right'});
+  y+=50;
+
+  const sc={checked_in:[224,160,80],checked_out:[76,175,135],confirmed:[91,192,190],cancelled:[224,92,92]};
+  const c=sc[res.status]||[91,192,190];
+  doc.setFillColor(c[0]*.15+11,c[1]*.15+11,c[2]*.15+11);
+  doc.roundedRect(L,y,70,12,2,2,'F');
+  doc.setTextColor(...c); doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
+  doc.text('● STATUS: '+(res.status||'').replace(/_/g,' ').toUpperCase(), L+5, y+8);
+
+  doc.setFillColor(11,19,43); doc.rect(0,272,W,28,'F');
+  doc.setTextColor(189,195,199); doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
+  doc.text('Thank you for choosing Ocean View Resort. We hope to welcome you again soon.', W/2, 282, {align:'center'});
+  doc.setTextColor(91,192,190);
+  doc.text('www.oceanviewgalle.lk  ·  +94 91 222 4567  ·  Galle, Sri Lanka', W/2, 291, {align:'center'});
+
+  doc.save('Invoice_'+(res.resNo||'bill')+'.pdf');
+}
+function fP(v){ return 'LKR '+parseFloat(v||0).toLocaleString('en-LK',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+/* ═════════════════════════════════════════
+   SEQUENCE 6 — EXIT
+   User → App: exit() → saveAndClose() → closed
+═════════════════════════════════════════ */
+function doLogout() {
+  if (confirm('Logout and exit the system?')) {
+    sessionStorage.removeItem('user'); // saveAndClose()
+    window.location.href = 'index.html'; // App → User: closed
+  }
+}
+
+/* ── Init ── */
+loadBookings();
+</script>
+</body>
+</html>
