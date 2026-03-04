@@ -54,7 +54,7 @@ class AuthApiTest extends ApiTestBase {
     void staffLogin_validCredentials_shouldSucceed() {
         given()
                 .contentType("application/json")
-                .body("{\"username\":\"staff\",\"password\":\"staff123\"}")
+                .body("{\"username\":\"nadia\",\"password\":\"staff123\"}")
                 .when()
                 .post("/api/auth/login")
                 .then()
