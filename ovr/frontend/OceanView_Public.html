@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" id="html-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean View Resort — Galle, Sri Lanka</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+
+        :root {
+          /* Accent colours — same in both themes */
+          --teal:    #2C8C7A;
+          --teal2:   #38B49A;
+          --err:     #D9614B;
+
+          /* ── Dark theme values (default) ── */
+          --bg:           #06111F;
+          --bg-alt:       #0A1E30;
+          --bg-card:      #0D2540;
+          --bg-input:     rgba(6,17,31,.75);
+          --bg-nav:       rgba(6,17,31,.94);
+          --bg-mob:       #06111F;
+          --surface:      rgba(13,43,64,.45);
+          --border:       rgba(44,140,122,.2);
+          --border-sub:   rgba(255,255,255,.055);
+          --text:         #E8E0D4;
+          --text2:        #C8C0B4;
+          --muted:        #8B9AAA;
+          --heading:      #FDFBF8;
+          --sand:         #C8A96E;
+          --sand2:        #E2C99A;
+          --scrolltrack:  #0A1E30;
+        }
+
+        [data-theme="light"] {
+          --bg:           #F2EDE4;
+          --bg-alt:       #FDFBF8;
+          --bg-card:      #FFFFFF;
+          --bg-input:     #FFFFFF;
+          --bg-nav:       rgba(242,237,228,.96);
+          --bg-mob:       #F2EDE4;
+          --surface:      rgba(235,248,244,.75);
+          --border:       rgba(44,140,122,.25);
+          --border-sub:   rgba(0,0,0,.07);
+          --text:         #2D3E48;
+          --text2:        #3A5060;
+          --muted:        #637888;
+          --heading:      #0D1E2A;
+          --sand:         #9A6C28;
+          --sand2:        #7A5010;
+          --scrolltrack:  #E8E3DA;
+        }
+
+        /* Global theme-switch transitions on everything except animations */
+        html { transition: background-color .4s ease, color .4s ease; }
+        body { transition: background-color .4s ease; }
+        nav,
+        .ebill-card, .binfo, .room-card, .test-card, .amenity,
+        .about-frame, .map-visual, .ccard, .contact-form,
+        footer, .bill-total-box, .feat,
+        .theme-pill, .theme-pill-btn,
+        .field input, .field select, .field textarea,
+        .ebill-input,
+        .footer-col a, .footer-col p, .footer-brand p,
+        .section-head h2, .section-head p,
+        .about-num, .loc-item,
+        .nav-name, .nav-links a, .nav-cta,
+        .btn-primary, .btn-outline,
+        h1,h2,h3,h4,h5,p,span,small,a {
+          transition: background-color .4s ease, color .4s ease, border-color .4s ease, box-shadow .4s ease !important;
+        }
+        /* Exclude from transition */
+        .hero-ocean, .star, .wave, .orb,
+        .gallery-panel,
+        .reveal, .reveal-l, .reveal-r,
+        .room-card::before,
+        .amenity::after { transition: none !important; }
+        .gallery-panel  { transition: transform .35s ease !important; }
+        .reveal         { transition: opacity .7s ease, transform .7s ease !important; }
+        .reveal-l       { transition: opacity .7s ease, transform .7s ease !important; }
+        .reveal-r       { transition: opacity .7s ease, transform .7s ease !important; }
+        .room-card::before { transition: transform .4s ease !important; }
+
+        /* ═══════════════════════════════════════════
+           RESET & BASE
+        ═══════════════════════════════════════════ */
+        *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+        html  { scroll-behavior:smooth; font-size:16px; }
+        body  {
+          background:var(--bg); color:var(--text);
+          font-family:'DM Sans',sans-serif; font-weight:300;
+          line-height:1.7; overflow-x:hidden;
+        }
+        ::selection { background:var(--teal); color:#fff; }
+        ::-webkit-scrollbar { width:3px; }
+        ::-webkit-scrollbar-track { background:var(--scrolltrack); }
+        ::-webkit-scrollbar-thumb { background:var(--teal); border-radius:2px; }
+        a { color:inherit; text-decoration:none; }
+        button { font-family:'DM Sans',sans-serif; cursor:pointer; }
+        input,select,textarea { font-family:'DM Sans',sans-serif; }
+
+        /* ═══════════════════════════════════════════
+           TYPOGRAPHY UTILITIES
+        ═══════════════════════════════════════════ */
+        .display {
+          font-family:'Cormorant Garamond',serif;
+          font-weight:300; line-height:1.05; letter-spacing:-.02em;
+        }
+        .overline {
+          font-size:.68rem; letter-spacing:.25em; text-transform:uppercase;
+          color:var(--teal2); font-weight:500;
+        }
+        .divider {
+          width:48px; height:1px;
+          background:linear-gradient(90deg,var(--teal),transparent);
+          margin-bottom:16px;
+        }
+
+        /* ═══════════════════════════════════════════
+           THEME TOGGLE PILL
+        ═══════════════════════════════════════════ */
+        .theme-pill {
+          display:inline-flex; align-items:center;
+          background:var(--bg-card); border:1px solid var(--border);
+          border-radius:100px; padding:3px; gap:2px; flex-shrink:0;
+        }
+        .tpb {
+          width:32px; height:32px; border-radius:50%; border:none;
+          background:transparent; cursor:pointer;
+          display:flex; align-items:center; justify-content:center; font-size:15px;
+          color:var(--muted); flex-shrink:0;
+          transition: background-color .25s ease, color .25s ease !important;
+        }
+        .tpb.active          { background:var(--teal);  color:#fff; }
+        [data-theme="light"] .tpb.active { background:var(--sand); color:#fff; }
+        .tpb:hover:not(.active) { color:var(--text2); }
+
+        /* ═══════════════════════════════════════════
+           NAV
+        ═══════════════════════════════════════════ */
+        nav {
+          position:fixed; top:0; left:0; right:0; z-index:200;
+          padding:20px 5%;
+          display:flex; align-items:center; justify-content:space-between; gap:16px;
+          transition: padding .5s ease, background .4s ease, border-color .4s ease !important;
+        }
+        nav.scrolled {
+          background:var(--bg-nav);
+          backdrop-filter:blur(24px) saturate(1.5);
+          padding:12px 5%;
+          border-bottom:1px solid var(--border);
+          box-shadow:0 4px 30px rgba(0,0,0,.12);
+        }
+        .nav-brand { display:flex; align-items:center; gap:11px; }
+        .nav-logo  {
+          width:36px; height:36px; border-radius:50%;
+          background:linear-gradient(135deg,var(--teal),#C8A96E);
+          display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;
+        }
+        .nav-name {
+          font-family:'Cormorant Garamond',serif;
+          font-size:1.15rem; font-weight:500; letter-spacing:.03em; color:var(--heading);
+        }
+        /* In hero (unscrolled) force light text since hero is always dark */
+        nav:not(.scrolled) .nav-name { color:#FDFBF8; }
+        nav:not(.scrolled) .nav-links a { color:rgba(253,251,248,.6); }
+        nav:not(.scrolled) .nav-links a:hover { color:#E2C99A; }
+        nav:not(.scrolled) .nav-cta { border-color:rgba(200,169,110,.55); color:#E2C99A; }
+
+        .nav-links { display:flex; align-items:center; gap:26px; }
+        .nav-links a {
+          font-size:.76rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
+          transition: color .25s !important;
+        }
+        .nav-links a:hover { color:var(--teal2); }
+
+        .nav-right { display:flex; align-items:center; gap:10px; }
+        .nav-cta {
+          background:transparent; border:1px solid var(--sand);
+          color:var(--sand2); padding:8px 18px; border-radius:3px;
+          font-size:.74rem; letter-spacing:.12em; text-transform:uppercase; white-space:nowrap;
+        }
+        .nav-cta:hover { background:var(--sand); color:var(--bg); }
+
+        .nav-menu {
+          display:none; flex-direction:column; gap:5px;
+          background:none; border:none; padding:4px; cursor:pointer;
+        }
+        .nav-menu span {
+          width:24px; height:1.5px; background:var(--heading);
+          display:block; transition:all .3s !important; transform-origin:center;
+        }
+        nav:not(.scrolled) .nav-menu span { background:#FDFBF8; }
+        .nav-menu.open span:nth-child(1) { transform:translateY(6.5px) rotate(45deg); }
+        .nav-menu.open span:nth-child(2) { opacity:0; }
+        .nav-menu.open span:nth-child(3) { transform:translateY(-6.5px) rotate(-45deg); }
+
+        .mobile-nav {
+          display:none; position:fixed; inset:0; z-index:199;
+          background:var(--bg-mob); padding:90px 8% 40px;
+          flex-direction:column; gap:20px; overflow-y:auto;
+          animation:mnin .3s ease;
+        }
+        .mobile-nav.open { display:flex; }
+        @keyframes mnin { from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)} }
+        .mobile-nav a {
+          font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:300; color:var(--heading);
+          border-bottom:1px solid var(--border-sub); padding-bottom:14px;
+        }
+        .mob-theme-row {
+          display:flex; align-items:center; gap:14px; padding-top:10px;
+        }
+        .mob-theme-lbl { font-size:.7rem; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); }
+
+        /* ═══════════════════════════════════════════
+           HERO — stays cinematic dark always
+        ═══════════════════════════════════════════ */
+        #hero {
+          position:relative; height:100svh; min-height:580px;
+          display:flex; align-items:flex-end; overflow:hidden; background:#06111F;
+        }
+        .hero-ocean {
+          position:absolute; inset:0; z-index:0;
+          background:linear-gradient(160deg,
+            #061420 0%, #0D2B40 25%, #0F3D52 45%, #1A5068 60%,
+            #0D3545 75%, #071828 90%, #06111F 100%);
+          animation:oshift 12s ease-in-out infinite alternate;
+        }
+        @keyframes oshift {
+          from { filter:hue-rotate(0deg) brightness(1); }
+          to   { filter:hue-rotate(8deg) brightness(1.08); }
+        }
+        .hero-canvas {
+          position:absolute; inset:0; z-index:1;
+          background:
+            radial-gradient(ellipse 120% 80% at 60% 40%,rgba(13,43,64,.9) 0%,transparent 65%),
+            linear-gradient(180deg,rgba(6,17,31,0) 40%,#06111F 100%);
+        }
+        /* Blend hero into light bg */
+        [data-theme="light"] .hero-canvas {
+          background:
+            radial-gradient(ellipse 120% 80% at 60% 40%,rgba(13,43,64,.9) 0%,transparent 65%),
+            linear-gradient(180deg,rgba(6,17,31,0) 40%,#F2EDE4 100%);
+        }
+        .stars { position:absolute; inset:0; z-index:2; overflow:hidden; }
+        .star  {
+          position:absolute; border-radius:50%;
+          background:rgba(253,251,248,.65);
+          animation:twinkle var(--d,3s) ease-in-out infinite var(--dl,0s) alternate;
+        }
+        @keyframes twinkle { from{opacity:.12}to{opacity:.88} }
+        [data-theme="light"] .star { opacity:.25; }
+
+        .waves { position:absolute; bottom:0; left:0; right:0; z-index:3; height:220px; }
+        .wave  { position:absolute; bottom:0; left:-10%; width:120%; height:100%; }
+        .wave svg { width:100%; height:100%; }
+        .wave1 { animation:wsway 9s ease-in-out infinite; opacity:.28; }
+        .wave2 { animation:wsway 11s ease-in-out infinite reverse; opacity:.16; bottom:10px; }
+        .wave3 { animation:wsway 7s ease-in-out infinite; opacity:.12; bottom:20px; }
+        @keyframes wsway { 0%,100%{transform:translateX(0)}50%{transform:translateX(-3%)} }
+
+        .orb {
+          position:absolute; border-radius:50%; pointer-events:none; z-index:2;
+          animation:orb-float var(--d,14s) ease-in-out infinite var(--dl,0s) alternate;
+          filter:blur(60px);
+        }
+        @keyframes orb-float {
+          from { transform:translate(0,0) scale(1); }
+          to   { transform:translate(var(--tx,20px),var(--ty,-20px)) scale(1.1); }
+        }
+        .hero-content {
+          position:relative; z-index:4; padding:0 8% 7vh; max-width:900px;
+        }
+        .hero-badge {
+          display:inline-flex; align-items:center; gap:7px;
+          background:rgba(44,140,122,.15); border:1px solid rgba(44,140,122,.3);
+          border-radius:2px; padding:6px 14px; margin-bottom:24px;
+          font-size:.72rem; letter-spacing:.2em; text-transform:uppercase; color:#38B49A;
+        }
+        .hero-h1 {
+          font-family:'Cormorant Garamond',serif;
+          font-size:clamp(3.2rem,9vw,7.5rem); font-weight:300; line-height:1;
+          color:#FDFBF8; letter-spacing:-.025em; margin-bottom:18px;
+        }
+        .hero-h1 em { font-style:italic; color:#E2C99A; display:block; font-size:.82em; }
+        .hero-sub {
+          font-size:clamp(.9rem,1.8vw,1.05rem); color:rgba(232,224,212,.65);
+          max-width:520px; margin-bottom:36px; line-height:1.75;
+        }
+        .hero-actions { display:flex; gap:14px; flex-wrap:wrap; align-items:center; }
+        .btn-primary {
+          background:var(--teal); color:#fff; border:none;
+          padding:14px 32px; border-radius:3px;
+          font-size:.82rem; letter-spacing:.1em; text-transform:uppercase;
+        }
+        .btn-primary:hover { background:var(--teal2); transform:translateY(-2px); box-shadow:0 12px 40px rgba(44,140,122,.35); }
+        .btn-outline {
+          background:transparent; border:1px solid rgba(200,169,110,.45);
+          color:#E2C99A; padding:14px 32px; border-radius:3px;
+          font-size:.82rem; letter-spacing:.1em; text-transform:uppercase;
+        }
+        .btn-outline:hover { border-color:#C8A96E; background:rgba(200,169,110,.1); }
+        .hero-scroll {
+          position:absolute; bottom:32px; right:8%; z-index:4;
+          display:flex; flex-direction:column; align-items:center; gap:8px;
+        }
+        .scroll-line {
+          width:1px; height:60px;
+          background:linear-gradient(180deg,rgba(200,169,110,.6),transparent);
+          animation:sline 2s ease-in-out infinite;
+        }
+        @keyframes sline { 0%,100%{transform:scaleY(1);opacity:.7}50%{transform:scaleY(.5);opacity:.3} }
+        .scroll-txt {
+          font-size:.6rem; letter-spacing:.2em; text-transform:uppercase;
+          color:rgba(200,169,110,.5); writing-mode:vertical-rl;
+        }
+
+        /* ═══════════════════════════════════════════
+           SHARED SECTION
+        ═══════════════════════════════════════════ */
+        section { padding:100px 8%; }
+        .section-head { margin-bottom:60px; }
+        .section-head h2 {
+          font-family:'Cormorant Garamond',serif;
+          font-size:clamp(2.4rem,5vw,4rem); font-weight:300; line-height:1.1;
+          color:var(--heading); letter-spacing:-.02em; margin-top:10px;
+        }
+        .section-head p { max-width:520px; color:var(--muted); font-size:.95rem; margin-top:12px; line-height:1.8; }
+
+        /* ═══════════════════════════════════════════
+           ABOUT
+        ═══════════════════════════════════════════ */
+        #about {
+          background:var(--bg);
+          display:grid; grid-template-columns:1fr 1fr; align-items:center; gap:80px; padding:120px 8%;
+        }
+        .about-visual { position:relative; }
+        .about-frame {
+          aspect-ratio:3/4; max-height:580px;
+          background:linear-gradient(145deg,var(--bg-card),var(--bg-alt));
+          border:1px solid var(--border); border-radius:4px; overflow:hidden; position:relative;
+        }
+        .about-frame::before {
+          content:''; position:absolute; inset:0;
+          background:
+            radial-gradient(ellipse 80% 60% at 30% 60%,rgba(44,140,122,.18) 0%,transparent 60%),
+            radial-gradient(ellipse 60% 80% at 70% 20%,rgba(200,169,110,.1) 0%,transparent 50%);
+        }
+        .about-scene {
+          position:absolute; inset:0; display:flex; align-items:center;
+          justify-content:center; flex-direction:column; gap:20px; padding:40px;
+        }
+        .about-icon-big { font-size:80px; opacity:.35; animation:float 6s ease-in-out infinite; }
+        @keyframes float { 0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)} }
+        .about-stat-pill {
+          background:rgba(44,140,122,.1); border:1px solid var(--border);
+          border-radius:100px; padding:8px 20px;
+          font-family:'Cormorant Garamond',serif; font-size:1.1rem; color:var(--teal2); text-align:center;
+        }
+        .about-accent {
+          position:absolute; bottom:-20px; right:-20px;
+          width:120px; height:120px; border-radius:3px;
+          background:linear-gradient(135deg,var(--teal),#C8A96E); opacity:.1;
+        }
+        .about-nums { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:36px; }
+        .about-num { padding:20px; border-left:2px solid var(--border); }
+        .about-num .n { font-family:'Cormorant Garamond',serif; font-size:2.5rem; font-weight:300; color:var(--sand2); line-height:1; }
+        .about-num .l { font-size:.78rem; letter-spacing:.1em; color:var(--muted); margin-top:4px; }
+
+        /* ═══════════════════════════════════════════
+           ROOMS
+        ═══════════════════════════════════════════ */
+        #rooms { background:var(--bg-alt); }
+        .rooms-grid {
+          display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+          gap:1px; background:var(--border-sub); border:1px solid var(--border-sub);
+          border-radius:4px; overflow:hidden;
+        }
+        .room-card { background:var(--bg-alt); padding:36px 30px; position:relative; overflow:hidden; }
+        .room-card::before {
+          content:''; position:absolute; top:0; left:0; right:0; height:2px;
+          background:linear-gradient(90deg,var(--teal),#C8A96E);
+          transform:scaleX(0); transform-origin:left;
+        }
+        .room-card:hover { background:var(--surface); }
+        .room-card:hover::before { transform:scaleX(1); }
+        .room-icon { font-size:2rem; margin-bottom:16px; opacity:.7; }
+        .room-card h3 { font-family:'Cormorant Garamond',serif; font-size:1.5rem; font-weight:400; color:var(--heading); margin-bottom:8px; }
+        .room-card p { font-size:.85rem; color:var(--muted); line-height:1.7; margin-bottom:20px; }
+        .room-rate { display:flex; align-items:baseline; gap:5px; margin-bottom:18px; }
+        .room-rate .amt { font-family:'Cormorant Garamond',serif; font-size:1.6rem; color:var(--sand2); font-weight:300; }
+        .room-rate .per { font-size:.72rem; color:var(--muted); letter-spacing:.08em; }
+        .room-feats { display:flex; flex-wrap:wrap; gap:6px; }
+        .feat {
+          font-size:.67rem; letter-spacing:.1em; text-transform:uppercase;
+          padding:3px 9px; border:1px solid var(--border); border-radius:100px; color:var(--teal2);
+        }
+
+        /* ═══════════════════════════════════════════
+           AMENITIES
+        ═══════════════════════════════════════════ */
+        #amenities { background:var(--bg); }
+        .amenities-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:2px; }
+        .amenity {
+          padding:32px 24px; border:1px solid var(--border-sub);
+          background:var(--surface); position:relative; overflow:hidden;
+        }
+        .amenity::after {
+          content:''; position:absolute; inset:0;
+          background:radial-gradient(circle at 50% 100%,rgba(44,140,122,.1),transparent 70%);
+          opacity:0; transition:opacity .4s !important;
+        }
+        .amenity:hover { border-color:var(--border); }
+        .amenity:hover::after { opacity:1; }
+        .amenity .icon { font-size:1.7rem; margin-bottom:12px; }
+        .amenity h4 { font-family:'Cormorant Garamond',serif; font-size:1.1rem; color:var(--heading); font-weight:400; margin-bottom:6px; }
+        .amenity p  { font-size:.78rem; color:var(--muted); line-height:1.6; }
+
+        /* ═══════════════════════════════════════════
+           GALLERY
+        ═══════════════════════════════════════════ */
+        #experience { background:var(--bg-alt); padding:100px 0; overflow:hidden; }
+        .gallery-scroll {
+          display:flex; gap:16px; overflow-x:auto; padding:32px 8% 16px;
+          scrollbar-width:none; scroll-snap-type:x mandatory;
+        }
+        .gallery-scroll::-webkit-scrollbar { display:none; }
+        .gallery-panel {
+          flex:0 0 300px; height:400px; border-radius:4px;
+          position:relative; overflow:hidden; scroll-snap-align:start; cursor:pointer;
+        }
+        .gallery-panel:hover { transform:scale(1.02); }
+        .gallery-panel:nth-child(2) { height:440px; flex:0 0 260px; margin-top:-20px; }
+        .gallery-panel:nth-child(4) { height:460px; flex:0 0 340px; }
+        .gallery-visual { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+        .gallery-visual .gi { font-size:3rem; opacity:.3; }
+        .gallery-panel::after {
+          content:attr(data-label); position:absolute; bottom:0; left:0; right:0;
+          background:linear-gradient(0deg,rgba(6,17,31,.85),transparent);
+          color:#F5EFE4; font-family:'Cormorant Garamond',serif;
+          font-size:1rem; padding:20px 18px 14px; font-style:italic;
+        }
+
+        /* ═══════════════════════════════════════════
+           TESTIMONIALS
+        ═══════════════════════════════════════════ */
+        #testimonials { background:var(--bg); padding:100px 8%; }
+        .test-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:24px; }
+        .test-card {
+          background:var(--surface); border:1px solid var(--border-sub);
+          border-radius:4px; padding:32px 28px; position:relative;
+        }
+        .test-card::before {
+          content:'\201C'; font-family:'Cormorant Garamond',serif;
+          font-size:5rem; color:var(--teal); opacity:.18;
+          position:absolute; top:10px; left:20px; line-height:1;
+        }
+        .test-txt {
+          font-family:'Cormorant Garamond',serif; font-style:italic;
+          font-size:1.1rem; line-height:1.65; color:var(--text2); margin-bottom:20px; position:relative; z-index:1;
+        }
+        .test-author { display:flex; align-items:center; gap:12px; }
+        .test-av {
+          width:36px; height:36px; border-radius:50%;
+          background:linear-gradient(135deg,var(--teal),#C8A96E);
+          display:flex; align-items:center; justify-content:center;
+          font-size:.85rem; font-weight:600; color:#fff; flex-shrink:0;
+        }
+        .test-info p     { font-size:.82rem; color:var(--text2); }
+        .test-info small { font-size:.72rem; color:var(--muted); }
+        .stars-row       { display:flex; gap:3px; margin-bottom:14px; }
+
+        /* ═══════════════════════════════════════════
+           LOCATION
+        ═══════════════════════════════════════════ */
+        #location {
+          background:var(--bg-alt);
+          display:grid; grid-template-columns:1fr 1fr; align-items:center; gap:80px; padding:120px 8%;
+        }
+        .map-visual {
+          background:var(--surface); border:1px solid var(--border);
+          border-radius:4px; height:380px;
+          display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;
+        }
+        .map-visual::before {
+          content:''; position:absolute; inset:0;
+          background:radial-gradient(ellipse at 50% 50%,rgba(44,140,122,.18) 0%,transparent 70%);
+          animation:mappulse 3s ease-in-out infinite alternate;
+        }
+        @keyframes mappulse { from{opacity:.5}to{opacity:1} }
+        .map-pin   { font-size:3.5rem; animation:bounce 2s ease-in-out infinite; position:relative; z-index:1; }
+        @keyframes bounce { 0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)} }
+        .map-label {
+          position:absolute; bottom:20px; left:50%; transform:translateX(-50%);
+          background:var(--bg-card); border:1px solid var(--border);
+          border-radius:100px; padding:6px 16px;
+          font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--teal2); white-space:nowrap;
+        }
+        .loc-list { display:flex; flex-direction:column; gap:16px; margin-top:28px; }
+        .loc-item { display:flex; align-items:flex-start; gap:14px; padding-bottom:16px; border-bottom:1px solid var(--border-sub); }
+        .loc-item:last-child { border-bottom:none; }
+        .loc-ico {
+          width:36px; height:36px; flex-shrink:0; border-radius:50%;
+          background:rgba(44,140,122,.1); display:flex; align-items:center; justify-content:center; font-size:1rem;
+        }
+        .loc-item strong { color:var(--heading); display:block; margin-bottom:2px; font-weight:500; }
+        .loc-item p { font-size:.85rem; color:var(--muted); line-height:1.6; }
+
+        /* ═══════════════════════════════════════════
+           CONTACT
+        ═══════════════════════════════════════════ */
+        #contact { background:var(--bg); padding:100px 8%; }
+        .contact-wrap { display:grid; grid-template-columns:1fr 1.2fr; gap:80px; align-items:start; }
+        .contact-form {
+          background:var(--surface); border:1px solid var(--border); border-radius:4px; padding:40px;
+        }
+        .contact-form h3 {
+          font-family:'Cormorant Garamond',serif; font-size:1.8rem; font-weight:400; color:var(--heading); margin-bottom:24px;
+        }
+        .field { margin-bottom:16px; }
+        .field label {
+          display:block; font-size:.68rem; letter-spacing:.18em; text-transform:uppercase; color:var(--teal2); margin-bottom:7px;
+        }
+        .field input,.field select,.field textarea {
+          width:100%; background:var(--bg-input); border:1px solid var(--border);
+          border-radius:3px; padding:11px 14px; color:var(--text); font-size:.88rem; outline:none;
+        }
+        .field input:focus,.field select:focus,.field textarea:focus { border-color:var(--teal2); }
+        .field input::placeholder,.field textarea::placeholder { color:var(--muted); }
+        .field select option { background:var(--bg-card); color:var(--text); }
+        .field textarea { resize:vertical; min-height:100px; }
+        .submit-btn {
+          width:100%; background:var(--teal); border:none; color:#fff;
+          padding:13px; border-radius:3px; font-size:.8rem; letter-spacing:.12em; text-transform:uppercase; margin-top:6px;
+        }
+        .submit-btn:hover { background:var(--teal2); transform:translateY(-1px); box-shadow:0 8px 30px rgba(44,140,122,.25); }
+        .contact-info { padding-top:10px; }
+        .contact-info h3 {
+          font-family:'Cormorant Garamond',serif; font-size:2.5rem; font-weight:300; color:var(--heading); line-height:1.1; margin-bottom:16px;
+        }
+        .contact-info h3 em { color:var(--sand2); font-style:italic; }
+        .contact-info > p { color:var(--muted); line-height:1.8; margin-bottom:28px; }
+        .contact-cards { display:flex; flex-direction:column; gap:12px; }
+        .ccard {
+          display:flex; align-items:center; gap:14px;
+          padding:14px 18px; background:var(--surface); border:1px solid var(--border-sub); border-radius:3px;
+        }
+        .ccard:hover { border-color:var(--border); }
+        .ccard .ci { font-size:1.2rem; }
+        .ccard p    { font-size:.83rem; color:var(--text2); }
+        .ccard small { font-size:.72rem; color:var(--muted); }
+
+        /* ═══════════════════════════════════════════
+           E-BILL PORTAL
+        ═══════════════════════════════════════════ */
+        #ebill { background:var(--bg-alt); padding:100px 8%; position:relative; overflow:hidden; }
+        #ebill::before {
+          content:''; position:absolute; inset:0; pointer-events:none;
+          background:radial-gradient(ellipse 60% 60% at 80% 50%,rgba(44,140,122,.07) 0%,transparent 65%);
+        }
+        .ebill-inner { max-width:760px; margin:0 auto; position:relative; z-index:1; }
+        .ebill-card {
+          background:var(--bg-card); border:1px solid var(--border);
+          border-radius:6px; padding:52px;
+          box-shadow:0 40px 100px rgba(0,0,0,.1);
+        }
+        [data-theme="dark"] .ebill-card { box-shadow:0 40px 100px rgba(0,0,0,.45); }
+        .ebill-lookup { display:flex; gap:10px; margin-top:28px; }
+        .ebill-input {
+          flex:1; background:var(--bg-input); border:1px solid var(--border);
+          border-radius:3px; padding:14px 18px; color:var(--text); font-size:.95rem; outline:none; letter-spacing:.05em;
+        }
+        .ebill-input:focus { border-color:var(--teal2); }
+        .ebill-input::placeholder { color:var(--muted); }
+        .ebill-btn {
+          background:var(--teal); border:none; color:#fff;
+          padding:14px 28px; border-radius:3px; font-size:.82rem; letter-spacing:.1em; text-transform:uppercase; white-space:nowrap;
+        }
+        .ebill-btn:hover { background:var(--teal2); transform:translateY(-1px); }
+        .ebill-alert { margin-top:16px; padding:11px 15px; border-radius:3px; font-size:.83rem; display:none; }
+        .ebill-alert.err { background:rgba(217,97,75,.1); border:1px solid rgba(217,97,75,.3); color:#D9614B; display:block; }
+        .ebill-alert.ok  { background:rgba(44,140,122,.1); border:1px solid rgba(44,140,122,.3); color:var(--teal2); display:block; }
+        .bill-result { margin-top:32px; display:none; }
+        .bill-result.show { display:block; animation:brin .4s cubic-bezier(.16,1,.3,1); }
+        @keyframes brin { from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)} }
+        .bill-divider { height:1px; background:linear-gradient(90deg,transparent,var(--border),transparent); margin:28px 0; }
+        .bill-head { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; gap:16px; flex-wrap:wrap; }
+        .bill-rno  { font-family:'Cormorant Garamond',serif; font-size:1.1rem; color:var(--sand2); }
+        .status-badge  { padding:5px 14px; border-radius:100px; font-size:.68rem; letter-spacing:.12em; text-transform:uppercase; font-weight:500; }
+        .status-confirmed  { background:rgba(44,140,122,.12); color:var(--teal2); border:1px solid rgba(44,140,122,.3); }
+        .status-checked_in { background:rgba(200,169,110,.12); color:#C8A96E;   border:1px solid rgba(200,169,110,.3); }
+        .status-checked_out{ background:rgba(80,120,180,.12);  color:#7AA0D4;   border:1px solid rgba(80,120,180,.3); }
+        .status-cancelled  { background:rgba(217,97,75,.1);    color:#D9614B;   border:1px solid rgba(217,97,75,.3); }
+        .bill-info-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px; }
+        .binfo { background:var(--surface); border:1px solid var(--border-sub); border-radius:3px; padding:14px 16px; }
+        .binfo .bl { font-size:.65rem; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); margin-bottom:4px; }
+        .binfo .bv { font-size:.9rem; color:var(--text2); }
+        .bill-table { width:100%; border-collapse:collapse; margin-bottom:20px; }
+        .bill-table th { font-size:.65rem; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); padding:8px 0; text-align:left; border-bottom:1px solid var(--border-sub); }
+        .bill-table th:last-child { text-align:right; }
+        .bill-table td { padding:10px 0; font-size:.88rem; color:var(--text2); border-bottom:1px solid var(--border-sub); }
+        .bill-table td:last-child { text-align:right; }
+        .bill-total-box { background:var(--surface); border:1px solid var(--border); border-radius:3px; padding:18px 20px; }
+        .bill-total-row { display:flex; justify-content:space-between; font-size:.85rem; color:var(--muted); padding:4px 0; }
+        .bill-total-row.grand {
+          font-family:'Cormorant Garamond',serif; font-size:1.4rem; color:var(--heading); font-weight:300;
+          padding-top:12px; margin-top:8px; border-top:1px solid var(--border);
+        }
+        .bill-total-row.grand span:last-child { color:var(--sand2); }
+        .bill-actions { display:flex; gap:10px; margin-top:24px; flex-wrap:wrap; }
+        .bill-dl {
+          flex:1; min-width:140px; background:var(--teal); border:none; color:#fff;
+          padding:12px 20px; border-radius:3px; font-size:.78rem; letter-spacing:.1em; text-transform:uppercase;
+        }
+        .bill-dl:hover { background:var(--teal2); transform:translateY(-1px); }
+        .bill-print {
+          flex:1; min-width:140px; background:transparent;
+          border:1px solid var(--border); color:var(--sand2);
+          padding:12px 20px; border-radius:3px; font-size:.78rem; letter-spacing:.1em; text-transform:uppercase;
+        }
+        .bill-print:hover { border-color:var(--sand); background:rgba(200,169,110,.07); }
+
+        /* ═══════════════════════════════════════════
+           FOOTER
+        ═══════════════════════════════════════════ */
+        footer { background:var(--bg); border-top:1px solid var(--border-sub); padding:60px 8% 40px; }
+        .footer-grid { display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr; gap:48px; margin-bottom:48px; }
+        .footer-brand h3 { font-family:'Cormorant Garamond',serif; font-size:1.5rem; font-weight:400; color:var(--heading); margin-bottom:12px; }
+        .footer-brand p  { font-size:.82rem; color:var(--muted); line-height:1.75; max-width:240px; }
+        .footer-col h4   { font-size:.68rem; letter-spacing:.2em; text-transform:uppercase; color:var(--teal2); margin-bottom:18px; }
+        .footer-col a,.footer-col p { display:block; font-size:.82rem; color:var(--muted); margin-bottom:9px; }
+        .footer-col a:hover { color:var(--text2); }
+        .footer-bottom {
+          display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;
+          padding-top:24px; border-top:1px solid var(--border-sub);
+        }
+        .footer-bottom p { font-size:.75rem; color:var(--muted); }
+        .footer-mark { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:.82rem; color:rgba(44,140,122,.5); }
+
+        /* ═══════════════════════════════════════════
+           PRINT
+        ═══════════════════════════════════════════ */
+        @media print {
+          nav,#hero,#about,#rooms,#amenities,#experience,
+          #testimonials,#location,#contact,footer,
+          .ebill-lookup,.bill-actions,.section-head,#ebill::before { display:none !important; }
+          body,#ebill { background:white; color:black; }
+          .ebill-card  { background:white; border:1px solid #ccc; box-shadow:none; padding:24px; }
+          .bill-result { display:block !important; }
+          .binfo { background:#f5f5f5; border-color:#ddd; }
+          .binfo .bv,.bill-table td { color:#111; }
+          .binfo .bl,.bill-table th,.bill-total-row { color:#555; }
+          .bill-total-box { background:#f0f8f5; border-color:#2C8C7A; }
+          .bill-total-row.grand { color:#111; }
+          .bill-total-row.grand span:last-child { color:#1A7060; }
+          .bill-rno { color:#1A7060; }
+        }
+
+        /* ═══════════════════════════════════════════
+           SCROLL REVEAL
+        ═══════════════════════════════════════════ */
+        .reveal   { opacity:0; transform:translateY(24px);   }
+        .reveal-l { opacity:0; transform:translateX(-24px);  }
+        .reveal-r { opacity:0; transform:translateX(24px);   }
+        .reveal.visible   { opacity:1; transform:translateY(0);  }
+        .reveal-l.visible { opacity:1; transform:translateX(0); }
+        .reveal-r.visible { opacity:1; transform:translateX(0); }
+        .delay-1 { transition-delay:.1s !important; }
+        .delay-2 { transition-delay:.2s !important; }
+        .delay-3 { transition-delay:.3s !important; }
+        .delay-4 { transition-delay:.4s !important; }
+
+        /* ═══════════════════════════════════════════
+           RESPONSIVE
+        ═══════════════════════════════════════════ */
+        @media(max-width:1100px) {
+          .nav-links { gap:18px; }
+          .nav-links a { font-size:.7rem; }
+        }
+        @media(max-width:900px) {
+          #about,#location { grid-template-columns:1fr; gap:48px; }
+          .about-frame { max-height:320px; aspect-ratio:16/9; }
+          .contact-wrap { grid-template-columns:1fr; gap:40px; }
+          .footer-grid { grid-template-columns:1fr 1fr; gap:32px; }
+        }
+        @media(max-width:768px) {
+          section { padding:70px 6%; }
+          #about,#location { padding:70px 6%; }
+          .nav-links,.nav-cta { display:none; }
+          .nav-menu { display:flex; }
+          /* Show theme pill in nav even on mobile */
+          .nav-right .theme-pill { display:inline-flex; }
+          nav { padding:16px 6%; }
+          nav.scrolled { padding:12px 6%; }
+          .hero-content { padding:0 6% 60px; }
+          .hero-h1 { font-size:clamp(2.6rem,11vw,5rem); }
+          .hero-actions { gap:10px; }
+          .btn-primary,.btn-outline { padding:12px 22px; font-size:.75rem; }
+          .ebill-card { padding:30px 22px; }
+          .ebill-lookup { flex-direction:column; }
+          .ebill-btn { width:100%; }
+          .bill-info-grid { grid-template-columns:1fr; }
+          .footer-grid { grid-template-columns:1fr; }
+          .footer-brand p { max-width:100%; }
+          .contact-form { padding:28px 20px; }
+        }
+        @media(max-width:480px) {
+          .hero-content { padding:0 5% 50px; }
+          .hero-actions { flex-direction:column; align-items:stretch; text-align:center; }
+          .about-nums { grid-template-columns:1fr 1fr; }
+          .hero-scroll { display:none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     NAV
+══════════════════════════════════════ -->
+<nav id="nav">
+    <a href="#hero" class="nav-brand">
+        <div class="nav-logo">🏖️</div>
+        <span class="nav-name">Ocean View Resort</span>
+    </a>
+
+    <div class="nav-links">
+        <a href="#about">About</a>
+        <a href="#rooms">Rooms</a>
+        <a href="#amenities">Amenities</a>
+        <a href="#experience">Gallery</a>
+        <a href="#testimonials">Reviews</a>
+        <a href="#location">Location</a>
+        <a href="#contact">Contact</a>
+    </div>
+
+    <div class="nav-right">
+        <!-- ★ Theme Toggle Pill ★ -->
+        <div class="theme-pill" title="Switch theme">
+            <button class="tpb" id="btn-dark"  onclick="setTheme('dark')"  title="Dark mode">🌙</button>
+            <button class="tpb" id="btn-light" onclick="setTheme('light')" title="Light mode">☀️</button>
+        </div>
+        <button class="nav-cta" onclick="document.getElementById('ebill').scrollIntoView({behavior:'smooth'})">View My Bill</button>
+    </div>
+
+    <button class="nav-menu" id="nav-menu" onclick="toggleMobileNav()" aria-label="Menu">
+        <span></span><span></span><span></span>
+    </button>
+</nav>
+
+<!-- Mobile Nav -->
+<div id="mobile-nav" class="mobile-nav">
+    <a href="#about"        onclick="closeMobileNav()">About</a>
+    <a href="#rooms"        onclick="closeMobileNav()">Rooms</a>
+    <a href="#amenities"    onclick="closeMobileNav()">Amenities</a>
+    <a href="#experience"   onclick="closeMobileNav()">Gallery</a>
+    <a href="#testimonials" onclick="closeMobileNav()">Reviews</a>
+    <a href="#location"     onclick="closeMobileNav()">Location</a>
+    <a href="#contact"      onclick="closeMobileNav()">Contact</a>
+    <a href="#ebill"        onclick="closeMobileNav()">🧾 View My Bill</a>
+    <div class="mob-theme-row">
+        <span class="mob-theme-lbl">Theme</span>
+        <div class="theme-pill">
+            <button class="tpb" id="mob-btn-dark"  onclick="setTheme('dark')"  title="Dark">🌙</button>
+            <button class="tpb" id="mob-btn-light" onclick="setTheme('light')" title="Light">☀️</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     HERO
+══════════════════════════════════════ -->
+<section id="hero">
+    <div class="hero-ocean"></div>
+    <div class="hero-canvas" id="hero-canvas"></div>
+    <div class="stars" id="stars"></div>
+    <div class="orb" style="width:500px;height:500px;top:-100px;right:-100px;background:radial-gradient(circle,rgba(44,140,122,.12),transparent 70%);--d:18s;--tx:30px;--ty:20px;"></div>
+    <div class="orb" style="width:400px;height:400px;bottom:0;left:10%;background:radial-gradient(circle,rgba(200,169,110,.07),transparent 70%);--d:14s;--dl:3s;--tx:-20px;--ty:-15px;"></div>
+    <div class="waves">
+        <div class="wave wave1"><svg viewBox="0 0 1440 220" preserveAspectRatio="none"><path fill="rgba(44,140,122,.18)" d="M0,120 C200,200 400,20 720,100 C1000,170 1240,30 1440,80 L1440,220 L0,220 Z"/></svg></div>
+        <div class="wave wave2"><svg viewBox="0 0 1440 220" preserveAspectRatio="none"><path fill="rgba(13,43,64,.55)" d="M0,80 C300,160 600,20 900,100 C1100,160 1300,60 1440,120 L1440,220 L0,220 Z"/></svg></div>
+        <div class="wave wave3"><svg viewBox="0 0 1440 220" preserveAspectRatio="none"><path id="w3p" fill="rgba(6,17,31,.85)" d="M0,140 C250,80 550,180 800,120 C1050,60 1280,150 1440,90 L1440,220 L0,220 Z"/></svg></div>
+    </div>
+    <div class="hero-content">
+        <div class="hero-badge">⭐ 5-Star Boutique Resort &nbsp;·&nbsp; Galle, Sri Lanka</div>
+        <h1 class="hero-h1">Where the sea<br><em>meets silence.</em></h1>
+        <p class="hero-sub">Nestled along the golden shores of Unawatuna, Ocean View Resort invites you to rediscover rest — with panoramic ocean views, ancient Ayurvedic traditions, and unhurried luxury.</p>
+        <div class="hero-actions">
+            <button class="btn-primary" onclick="scrollTo('#rooms')">Explore Suites</button>
+            <button class="btn-outline"  onclick="scrollTo('#contact')">Plan Your Stay</button>
+        </div>
+    </div>
+    <div class="hero-scroll">
+        <div class="scroll-line"></div>
+        <span class="scroll-txt">Discover</span>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     ABOUT
+══════════════════════════════════════ -->
+<section id="about">
+    <div class="about-visual reveal-l">
+        <div class="about-frame">
+            <div class="about-scene">
+                <div class="about-icon-big">🏝️</div>
+                <div class="about-stat-pill">Unawatuna Beach, Galle</div>
+                <div class="about-stat-pill" style="font-size:.85rem;">Southern Province · Sri Lanka</div>
+            </div>
+        </div>
+        <div class="about-accent"></div>
+    </div>
+    <div class="reveal-r">
+        <div class="divider"></div>
+        <p class="overline">Our Story</p>
+        <h2 class="display" style="font-size:clamp(2.2rem,4.5vw,3.6rem);color:var(--heading);margin-bottom:20px;line-height:1.1;">A sanctuary carved<br>from coral and <em style="color:var(--sand2);font-style:italic">light</em></h2>
+        <p style="color:var(--muted);line-height:1.85;margin-bottom:16px;">Established in 2009 on the most storied stretch of Sri Lanka's southern coastline, Ocean View Resort has grown from a boutique family guesthouse into one of the Indian Ocean's most celebrated coastal retreats.</p>
+        <p style="color:var(--muted);line-height:1.85;margin-bottom:32px;">Every room faces the water. Every meal uses ingredients grown within forty kilometres. Every experience is quietly extraordinary — whether you spend your days swimming in the infinity pool, exploring colonial-era Galle Fort, or simply reading in a hammock as the Indian Ocean breathes beneath you.</p>
+        <div class="about-nums">
+            <div class="about-num"><div class="n">15</div><div class="l">Years of Excellence</div></div>
+            <div class="about-num"><div class="n">12</div><div class="l">Unique Suites</div></div>
+            <div class="about-num"><div class="n">4.9</div><div class="l">Average Rating</div></div>
+            <div class="about-num"><div class="n">6k+</div><div class="l">Guests Hosted</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     ROOMS
+══════════════════════════════════════ -->
+<section id="rooms">
+    <div class="section-head reveal">
+        <div class="divider"></div>
+        <p class="overline">Accommodation</p>
+        <h2>Rooms &amp; Suites</h2>
+        <p>Each of our twelve rooms is a considered composition of ocean light, natural materials, and quiet comfort. All rates in Sri Lankan Rupees per night.</p>
+    </div>
+    <div class="rooms-grid reveal">
+        <div class="room-card delay-1">
+            <div class="room-icon">🌊</div><h3>Deluxe Ocean Suite</h3>
+            <p>55m² sanctuary with a private wrap-around balcony, king bed swathed in organic cotton, and an unobstructed sunrise over the Indian Ocean.</p>
+            <div class="room-rate"><span class="amt">LKR 8,500</span><span class="per">/ night</span></div>
+            <div class="room-feats"><span class="feat">Ocean Balcony</span><span class="feat">King Bed</span><span class="feat">Free Minibar</span><span class="feat">55 m²</span></div>
+        </div>
+        <div class="room-card delay-2">
+            <div class="room-icon">🏡</div><h3>Premier Ocean View</h3>
+            <p>38m² room with floor-to-ceiling sliding glass that dissolves the boundary between your room and the horizon. Rainfall shower and handcrafted furniture.</p>
+            <div class="room-rate"><span class="amt">LKR 6,500</span><span class="per">/ night</span></div>
+            <div class="room-feats"><span class="feat">Sea View</span><span class="feat">Glass Wall</span><span class="feat">Rainfall Shower</span></div>
+        </div>
+        <div class="room-card delay-3">
+            <div class="room-icon">🌿</div><h3>Garden Standard Room</h3>
+            <p>Cozy 28m² room nestled within the resort's tropical garden. Latticed screens, terracotta floors, and a private outdoor shower surrounded by frangipani.</p>
+            <div class="room-rate"><span class="amt">LKR 4,200</span><span class="per">/ night</span></div>
+            <div class="room-feats"><span class="feat">Garden View</span><span class="feat">Outdoor Shower</span><span class="feat">28 m²</span></div>
+        </div>
+        <div class="room-card delay-4">
+            <div class="room-icon">👨‍👩‍👧‍👦</div><h3>Family Retreat Suite</h3>
+            <p>A 72m² two-bedroom suite designed for families — with a shared lounge, bunk room for children, private plunge pool, and direct lawn access to the beach.</p>
+            <div class="room-rate"><span class="amt">LKR 12,000</span><span class="per">/ night</span></div>
+            <div class="room-feats"><span class="feat">2 Bedrooms</span><span class="feat">Plunge Pool</span><span class="feat">Beach Access</span></div>
+        </div>
+        <div class="room-card">
+            <div class="room-icon">👑</div><h3>Presidential Villa</h3>
+            <p>Our pinnacle of luxury. 150m² of private paradise with an infinity pool, dedicated butler, private dining pavilion, and ocean frontage that takes your breath away.</p>
+            <div class="room-rate"><span class="amt">LKR 28,000</span><span class="per">/ night</span></div>
+            <div class="room-feats"><span class="feat">Private Pool</span><span class="feat">Butler</span><span class="feat">150 m²</span><span class="feat">Beach Front</span></div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     AMENITIES
+══════════════════════════════════════ -->
+<section id="amenities">
+    <div class="section-head reveal">
+        <div class="divider"></div>
+        <p class="overline">Resort Facilities</p>
+        <h2>Amenities &amp; Experiences</h2>
+        <p>From sunrise yoga on the beach to candlelit dinners under the stars — every moment at Ocean View is designed to feel effortlessly memorable.</p>
+    </div>
+    <div class="amenities-grid reveal">
+        <div class="amenity delay-1"><div class="icon">🏊</div><h4>Infinity Pool</h4><p>Ocean-edge infinity pool with submerged sun loungers and seamless sea views.</p></div>
+        <div class="amenity delay-2"><div class="icon">🧘</div><h4>Ayurveda Spa</h4><p>Traditional Sri Lankan treatments, hot stone therapies, and custom wellness programmes.</p></div>
+        <div class="amenity delay-3"><div class="icon">🍽️</div><h4>Fine Dining</h4><p>Coastal cuisine by our award-winning chef. Freshest catch, daily.</p></div>
+        <div class="amenity delay-4"><div class="icon">🤿</div><h4>Water Sports</h4><p>Snorkelling, windsurfing, kayaking, and glass-bottom boat excursions.</p></div>
+        <div class="amenity delay-1"><div class="icon">🏋️</div><h4>Fitness Centre</h4><p>Air-conditioned gym with ocean views and personal training on request.</p></div>
+        <div class="amenity delay-2"><div class="icon">🚘</div><h4>Airport Transfer</h4><p>Complimentary luxury transfer from Bandaranaike or Mattala airports.</p></div>
+        <div class="amenity delay-3"><div class="icon">📶</div><h4>High-Speed Wi-Fi</h4><p>Fibre connectivity throughout the resort, including on the beach.</p></div>
+        <div class="amenity delay-4"><div class="icon">🌺</div><h4>Botanical Garden</h4><p>Three-acre tropical garden with guided botanical walks and bird watching.</p></div>
+        <div class="amenity delay-1"><div class="icon">🐘</div><h4>Safari Excursions</h4><p>Private day trips to Yala National Park and Udawalawe Elephant Reserve.</p></div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     GALLERY
+══════════════════════════════════════ -->
+<section id="experience" style="padding:100px 0;overflow:hidden;">
+    <div class="reveal" style="padding:0 8%">
+        <div class="divider"></div>
+        <p class="overline">Life at the Resort</p>
+        <h2 class="display" style="font-size:clamp(2.2rem,4vw,3.4rem);color:var(--heading);margin-top:10px;">Moments that<br><em style="color:var(--sand2)">stay with you.</em></h2>
+    </div>
+    <div class="gallery-scroll" style="margin-top:32px;">
+        <div class="gallery-panel" data-label="Infinity Pool at sunset"     style="background:linear-gradient(145deg,#0D3550,#1A6070,#2C8C7A)"><div class="gallery-visual"><div class="gi">🌅</div></div></div>
+        <div class="gallery-panel" data-label="Deluxe Ocean Suite terrace"  style="background:linear-gradient(145deg,#0A2030,#164055,#0D2B40)"><div class="gallery-visual"><div class="gi">🛏️</div></div></div>
+        <div class="gallery-panel" data-label="Ayurveda treatment room"     style="background:linear-gradient(145deg,#1A3020,#2A5030,#183525)"><div class="gallery-visual"><div class="gi">🪷</div></div></div>
+        <div class="gallery-panel" data-label="Fresh-catch coastal dining"  style="background:linear-gradient(145deg,#2B1A0A,#50300F,#3A2510)"><div class="gallery-visual"><div class="gi">🦞</div></div></div>
+        <div class="gallery-panel" data-label="Underwater snorkel trail"    style="background:linear-gradient(145deg,#041826,#083550,#104060)"><div class="gallery-visual"><div class="gi">🐠</div></div></div>
+        <div class="gallery-panel" data-label="Presidential Villa pool"     style="background:linear-gradient(145deg,#0A1A30,#142840,#0D2235)"><div class="gallery-visual"><div class="gi">👑</div></div></div>
+    </div>
+    <p style="text-align:center;font-size:.75rem;color:var(--muted);margin-top:12px;padding:0 8%;letter-spacing:.1em;">← Scroll to explore →</p>
+</section>
+
+<!-- ══════════════════════════════════════
+     TESTIMONIALS
+══════════════════════════════════════ -->
+<section id="testimonials">
+    <div class="section-head reveal">
+        <div class="divider"></div>
+        <p class="overline">Guest Reviews</p>
+        <h2>What our guests say</h2>
+    </div>
+    <div class="test-grid reveal">
+        <div class="test-card delay-1">
+            <div class="stars-row"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div>
+            <p class="test-txt">"We've stayed at many five-star resorts across Asia, and nothing has come close to Ocean View. The Deluxe Ocean Suite felt like our own private world. We will be back every year."</p>
+            <div class="test-author"><div class="test-av">SC</div><div class="test-info"><p>Sarah Chen</p><small>Singapore · March 2025</small></div></div>
+        </div>
+        <div class="test-card delay-2">
+            <div class="stars-row"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div>
+            <p class="test-txt">"The Ayurveda spa was a revelation. The food was extraordinary — every breakfast felt like the chef had cooked it just for us. And the infinity pool at dusk? Unforgettable."</p>
+            <div class="test-author"><div class="test-av">MR</div><div class="test-info"><p>Marco Romano</p><small>Italy · March 2025</small></div></div>
+        </div>
+        <div class="test-card delay-3">
+            <div class="stars-row"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div>
+            <p class="test-txt">"Brought the whole family. The children loved the snorkelling and the garden; my wife loved the spa; I loved doing absolutely nothing on the beach. The Family Suite is perfect."</p>
+            <div class="test-author"><div class="test-av">LH</div><div class="test-info"><p>Liam Hartley</p><small>United Kingdom · March 2025</small></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     LOCATION
+══════════════════════════════════════ -->
+<section id="location">
+    <div class="reveal-l">
+        <div class="divider"></div>
+        <p class="overline">Find Us</p>
+        <h2 class="display" style="font-size:clamp(2rem,4vw,3.2rem);color:var(--heading);margin-bottom:20px;">At the heart of<br><em style="color:var(--sand2)">Sri Lanka's south</em></h2>
+        <p style="color:var(--muted);line-height:1.85;margin-bottom:28px;">Located on the quietest stretch of Unawatuna Beach, fifteen minutes from the UNESCO-listed Galle Fort and two hours from Colombo's Bandaranaike International Airport.</p>
+        <div class="loc-list">
+            <div class="loc-item"><div class="loc-ico">📍</div><div><strong>Address</strong><p>Unawatuna Beach Road, Galle, Southern Province, Sri Lanka 80000</p></div></div>
+            <div class="loc-item"><div class="loc-ico">✈️</div><div><strong>From Bandaranaike Airport (CMB)</strong><p>Approx. 2.5 hrs by road · Complimentary airport transfer included</p></div></div>
+            <div class="loc-item"><div class="loc-ico">🚂</div><div><strong>From Galle Railway Station</strong><p>10 minutes by tuk-tuk · We arrange pickup on request</p></div></div>
+            <div class="loc-item"><div class="loc-ico">📞</div><div><strong>Reservations</strong><p>+94 91 222 4567 · reservations@oceanviewgalle.lk</p></div></div>
+        </div>
+    </div>
+    <div class="reveal-r">
+        <div class="map-visual">
+            <div class="map-pin">📍</div>
+            <div class="map-label">🏖️ Ocean View Resort · Galle</div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     CONTACT
+══════════════════════════════════════ -->
+<section id="contact">
+    <div class="section-head reveal">
+        <div class="divider"></div>
+        <p class="overline">Reservations &amp; Enquiries</p>
+        <h2>Plan your escape</h2>
+    </div>
+    <div class="contact-wrap">
+        <div class="contact-info reveal-l">
+            <h3>Let us help you<br><em>find your perfect stay.</em></h3>
+            <p>Our reservations team is available seven days a week, 7 AM – 10 PM Sri Lanka time, to help craft your ideal Ocean View experience.</p>
+            <div class="contact-cards">
+                <div class="ccard"><span class="ci">📞</span><div><p>+94 91 222 4567</p><small>Reservations Line</small></div></div>
+                <div class="ccard"><span class="ci">✉️</span><div><p>reservations@oceanviewgalle.lk</p><small>24-hour response guaranteed</small></div></div>
+                <div class="ccard"><span class="ci">💬</span><div><p>WhatsApp: +94 77 222 4567</p><small>Quick enquiries</small></div></div>
+                <div class="ccard"><span class="ci">🕐</span><div><p>Check-in 14:00 · Check-out 11:00</p><small>Early/late available on request</small></div></div>
+            </div>
+        </div>
+        <div class="contact-form reveal-r">
+            <h3>Send an Enquiry</h3>
+            <div id="eq-alert" style="display:none;padding:11px 15px;border-radius:3px;font-size:.83rem;margin-bottom:16px;"></div>
+            <div class="field"><label>Full Name</label><input id="eq-name" type="text" placeholder="Your full name"></div>
+            <div class="field"><label>Email Address</label><input id="eq-email" type="email" placeholder="your@email.com"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:13px">
+                <div class="field"><label>Check-in</label><input id="eq-in" type="date"></div>
+                <div class="field"><label>Check-out</label><input id="eq-out" type="date"></div>
+            </div>
+            <div class="field"><label>Room Type</label>
+                <select id="eq-room">
+                    <option value="">— Select preference —</option>
+                    <option>Deluxe Ocean Suite — LKR 8,500</option>
+                    <option>Premier Ocean View — LKR 6,500</option>
+                    <option>Garden Standard Room — LKR 4,200</option>
+                    <option>Family Retreat Suite — LKR 12,000</option>
+                    <option>Presidential Villa — LKR 28,000</option>
+                </select>
+            </div>
+            <div class="field"><label>Message (optional)</label><textarea id="eq-msg" placeholder="Special requests, accessibility needs, celebrations…"></textarea></div>
+            <button class="submit-btn" onclick="sendEnquiry()">Send Enquiry</button>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     E-BILL PORTAL
+══════════════════════════════════════ -->
+<section id="ebill">
+    <div class="ebill-inner">
+        <div class="ebill-card reveal">
+            <p class="overline" style="text-align:center;">Guest Services</p>
+            <h2 class="display" style="font-size:clamp(2rem,4vw,3rem);color:var(--heading);text-align:center;line-height:1.1;margin:8px 0;">View Your E-Bill</h2>
+            <p style="text-align:center;color:var(--muted);font-size:.88rem;max-width:440px;margin:0 auto;">Enter your reservation reference number from your booking confirmation email to view, print, or download your official invoice.</p>
+            <div class="ebill-lookup">
+                <input class="ebill-input" id="ebill-resno" type="text" placeholder="e.g. RES-20250301-001"
+                       onkeydown="if(event.key==='Enter')fetchBill()">
+                <button class="ebill-btn" onclick="fetchBill()">View Bill</button>
+            </div>
+            <div id="ebill-alert" class="ebill-alert"></div>
+            <div class="bill-result" id="bill-result">
+                <div class="bill-divider"></div>
+                <div class="bill-head">
+                    <div>
+                        <p style="font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;">Reservation</p>
+                        <p class="bill-rno" id="br-resno">—</p>
+                    </div>
+                    <span class="status-badge" id="br-status">—</span>
+                </div>
+                <div class="bill-info-grid">
+                    <div class="binfo"><div class="bl">Guest Name</div><div class="bv" id="bi-name">—</div></div>
+                    <div class="binfo"><div class="bl">Email</div><div class="bv" id="bi-email" style="font-size:.8rem;word-break:break-all">—</div></div>
+                    <div class="binfo"><div class="bl">Room</div><div class="bv" id="bi-room">—</div></div>
+                    <div class="binfo"><div class="bl">Room Type</div><div class="bv" id="bi-type">—</div></div>
+                    <div class="binfo"><div class="bl">Check-in</div><div class="bv" id="bi-in">—</div></div>
+                    <div class="binfo"><div class="bl">Check-out</div><div class="bv" id="bi-out">—</div></div>
+                </div>
+                <table class="bill-table">
+                    <thead><tr><th>Description</th><th>Nights</th><th>Rate / Night</th><th>Amount</th></tr></thead>
+                    <tbody id="bill-tbl-body"></tbody>
+                </table>
+                <div class="bill-total-box">
+                    <div class="bill-total-row"><span>Subtotal</span><span id="bt-sub">—</span></div>
+                    <div class="bill-total-row"><span>VAT (12%)</span><span id="bt-tax">—</span></div>
+                    <div class="bill-total-row grand"><span>Total Due</span><span id="bt-total">—</span></div>
+                </div>
+                <div class="bill-actions">
+                    <button class="bill-dl" onclick="downloadBillPDF()">⬇ Download PDF Invoice</button>
+                    <button class="bill-print" onclick="window.print()">🖨 Print Bill</button>
+                </div>
+                <p style="text-align:center;font-size:.72rem;color:var(--muted);margin-top:16px;">
+                    For billing queries contact <span style="color:var(--teal2)">reservations@oceanviewgalle.lk</span> or call +94 91 222 4567
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     FOOTER
+══════════════════════════════════════ -->
+<footer>
+    <div class="footer-grid">
+        <div class="footer-brand">
+            <h3>🏖️ Ocean View Resort</h3>
+            <p>A boutique five-star retreat on the shores of Unawatuna Beach, Galle — where the Indian Ocean meets unhurried luxury.</p>
+        </div>
+        <div class="footer-col">
+            <h4>Explore</h4>
+            <a href="#rooms">Rooms &amp; Suites</a>
+            <a href="#amenities">Amenities</a>
+            <a href="#experience">Gallery</a>
+            <a href="#testimonials">Guest Reviews</a>
+        </div>
+        <div class="footer-col">
+            <h4>Guest Services</h4>
+            <a href="#contact">Make a Reservation</a>
+            <a href="#ebill">View My E-Bill</a>
+            <a href="#contact">Special Occasions</a>
+            <a href="#location">Getting Here</a>
+        </div>
+        <div class="footer-col">
+            <h4>Contact</h4>
+            <p>+94 91 222 4567</p>
+            <p>reservations@oceanviewgalle.lk</p>
+            <p style="margin-top:8px;">Unawatuna Beach Road<br>Galle, Sri Lanka 80000</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2025 Ocean View Resort · All rights reserved</p>
+        <p class="footer-mark">Where the sea meets silence.</p>
+    </div>
+</footer>
+
+<script>
+    /* ════════════════════════════════════════════════
+       THEME — Dark (Midnight Depths) / Light (Golden Shore)
+       Persisted in localStorage
+    ════════════════════════════════════════════════ */
+    const HTML = document.getElementById('html-root');
+
+    function setTheme(t) {
+      HTML.setAttribute('data-theme', t);
+      localStorage.setItem('ovr-theme', t);
+
+      // Sync all pill buttons (desktop + mobile)
+      ['btn-dark','mob-btn-dark'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('active', t === 'dark');
+      });
+      ['btn-light','mob-btn-light'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('active', t === 'light');
+      });
+
+      // Wave 3 bottom path matches body bg
+      const w3 = document.getElementById('w3p');
+      if (w3) w3.setAttribute('fill', t === 'light' ? '#F2EDE4' : 'rgba(6,17,31,.85)');
+
+      // Hero canvas gradient bottom also matches
+      const hc = document.getElementById('hero-canvas');
+      if (hc) {
+        const bg = t === 'light' ? '#F2EDE4' : '#06111F';
+        hc.style.background = `radial-gradient(ellipse 120% 80% at 60% 40%,rgba(13,43,64,.9) 0%,transparent 65%),
+          linear-gradient(180deg,rgba(6,17,31,0) 40%,${bg} 100%)`;
+      }
+    }
+
+    // Initialise from saved preference or default dark
+    (function() {
+      setTheme(localStorage.getItem('ovr-theme') || 'dark');
+    })();
+
+    /* ════════════════════════════════════════════════
+       STARS
+    ════════════════════════════════════════════════ */
+    (function() {
+      const c = document.getElementById('stars');
+      for (let i = 0; i < 80; i++) {
+        const s = document.createElement('div');
+        s.className = 'star';
+        const sz = Math.random() * 2 + 1;
+        s.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*65}%;--d:${(Math.random()*3+2).toFixed(1)}s;--dl:${(Math.random()*4).toFixed(1)}s;`;
+        c.appendChild(s);
+      }
+    })();
+
+    /* ════════════════════════════════════════════════
+       NAV SCROLL
+    ════════════════════════════════════════════════ */
+    window.addEventListener('scroll', () => {
+      document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 60);
+      revealOnScroll();
+    }, { passive:true });
+
+    /* ════════════════════════════════════════════════
+       MOBILE NAV
+    ════════════════════════════════════════════════ */
+    function toggleMobileNav() {
+      const m = document.getElementById('mobile-nav');
+      const b = document.getElementById('nav-menu');
+      const open = m.classList.toggle('open');
+      b.classList.toggle('open', open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    }
+    function closeMobileNav() {
+      document.getElementById('mobile-nav').classList.remove('open');
+      document.getElementById('nav-menu').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    /* ════════════════════════════════════════════════
+       SCROLL UTILS
+    ════════════════════════════════════════════════ */
+    function scrollTo(sel) {
+      const el = document.querySelector(sel);
+      if (el) el.scrollIntoView({ behavior:'smooth' });
+    }
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const t = document.querySelector(a.getAttribute('href'));
+        if (t) { e.preventDefault(); t.scrollIntoView({ behavior:'smooth' }); }
+      });
+    });
+
+    /* ════════════════════════════════════════════════
+       SCROLL REVEAL
+    ════════════════════════════════════════════════ */
+    function revealOnScroll() {
+      document.querySelectorAll('.reveal,.reveal-l,.reveal-r').forEach(el => {
+        if (el.getBoundingClientRect().top < window.innerHeight * .88)
+          el.classList.add('visible');
+      });
+    }
+    revealOnScroll();
+
+    /* ════════════════════════════════════════════════
+       ENQUIRY FORM
+    ════════════════════════════════════════════════ */
+    function sendEnquiry() {
+      const name  = document.getElementById('eq-name').value.trim();
+      const email = document.getElementById('eq-email').value.trim();
+      const al    = document.getElementById('eq-alert');
+      if (!name || !email) {
+        al.style.cssText = 'display:block;background:rgba(217,97,75,.1);border:1px solid rgba(217,97,75,.3);color:#D9614B;padding:11px 15px;border-radius:3px;font-size:.83rem;margin-bottom:16px;';
+        al.textContent = 'Please fill in your name and email address.'; return;
+      }
+      al.style.cssText = 'display:block;background:rgba(44,140,122,.1);border:1px solid rgba(44,140,122,.3);color:#38B49A;padding:11px 15px;border-radius:3px;font-size:.83rem;margin-bottom:16px;';
+      al.textContent = '✅ Enquiry sent! Our team will respond within 2 business hours.';
+      ['eq-name','eq-email','eq-in','eq-out','eq-msg'].forEach(id => { const e=document.getElementById(id); if(e) e.value=''; });
+      document.getElementById('eq-room').value='';
+    }
+
+    /* ════════════════════════════════════════════════
+       E-BILL LOOKUP
+    ════════════════════════════════════════════════ */
+    const API = 'http://localhost:8080/api';
+    let currentBillData = null;
+    const fmtLKR = v => 'LKR ' + parseFloat(v||0).toLocaleString('en-LK',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+    async function fetchBill() {
+      const resNo    = document.getElementById('ebill-resno').value.trim().toUpperCase();
+      const alertEl  = document.getElementById('ebill-alert');
+      const resultEl = document.getElementById('bill-result');
+      alertEl.className='ebill-alert'; alertEl.textContent='';
+      resultEl.classList.remove('show');
+      if (!resNo) { alertEl.className='ebill-alert err'; alertEl.textContent='Please enter your reservation number.'; return; }
+      alertEl.className='ebill-alert ok'; alertEl.textContent='Looking up your reservation…';
+      try {
+        const r = await fetch(`${API}/ebill/${resNo}`);
+        const d = await r.json();
+        if (!d.success) { alertEl.className='ebill-alert err'; alertEl.textContent='Reservation not found. Please check your reference number and try again.'; return; }
+        currentBillData = d; alertEl.className='ebill-alert';
+        document.getElementById('br-resno').textContent = d.resNo;
+        document.getElementById('bi-name').textContent  = d.guestName;
+        document.getElementById('bi-email').textContent = d.guestEmail||'—';
+        document.getElementById('bi-room').textContent  = d.roomId;
+        document.getElementById('bi-type').textContent  = d.roomType;
+        document.getElementById('bi-in').textContent    = d.checkIn;
+        document.getElementById('bi-out').textContent   = d.checkOut;
+        document.getElementById('bt-sub').textContent   = fmtLKR(d.subtotal);
+        document.getElementById('bt-tax').textContent   = fmtLKR(d.tax);
+        document.getElementById('bt-total').textContent = fmtLKR(d.total);
+        const sb = document.getElementById('br-status');
+        sb.textContent = (d.status||'').replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+        sb.className   = 'status-badge status-'+(d.status||'confirmed');
+        document.getElementById('bill-tbl-body').innerHTML =
+          `<tr><td>${d.roomType}</td><td>${d.nights} nights</td><td>${fmtLKR(d.ratePerNight)}</td><td>${fmtLKR(d.subtotal)}</td></tr>`;
+        resultEl.classList.add('show');
+        resultEl.scrollIntoView({behavior:'smooth',block:'nearest'});
+      } catch(e) { alertEl.className='ebill-alert err'; alertEl.textContent='Could not connect to the server. Please try again or contact us directly.'; }
+    }
+
+    /* ════════════════════════════════════════════════
+       PDF INVOICE
+    ════════════════════════════════════════════════ */
+    function downloadBillPDF() {
+      if (!currentBillData||typeof window.jspdf==='undefined') return;
+      const d=currentBillData, {jsPDF}=window.jspdf, doc=new jsPDF({unit:'mm',format:'a4'});
+      const W=210,ML=20,MR=190;
+      doc.setFillColor(6,17,31);doc.rect(0,0,W,60,'F');
+      doc.setFillColor(10,30,48);doc.rect(0,52,W,16,'F');
+      doc.setTextColor(44,140,122);doc.setFont('helvetica','bold');doc.setFontSize(24);doc.text('OCEAN VIEW RESORT',ML,22);
+      doc.setTextColor(180,190,200);doc.setFont('helvetica','normal');doc.setFontSize(9);
+      doc.text('Unawatuna Beach Road, Galle, Southern Province, Sri Lanka 80000',ML,31);
+      doc.text('reservations@oceanviewgalle.lk  ·  +94 91 222 4567',ML,38);
+      doc.setTextColor(200,169,110);doc.setFont('helvetica','bold');doc.setFontSize(18);doc.text('INVOICE',MR,22,{align:'right'});
+      doc.setTextColor(140,160,180);doc.setFont('helvetica','normal');doc.setFontSize(9);
+      doc.text(d.resNo||'',MR,30,{align:'right'});doc.text('Date: '+new Date().toLocaleDateString('en-GB'),MR,37,{align:'right'});
+      doc.setDrawColor(44,140,122);doc.setLineWidth(.4);doc.line(ML,58,MR,58);
+      let y=70;
+      doc.setFillColor(10,27,44);doc.roundedRect(ML,y,82,50,2,2,'F');
+      doc.setTextColor(44,140,122);doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.text('BILLED TO',ML+5,y+9);
+      doc.setTextColor(240,240,240);doc.setFont('helvetica','bold');doc.setFontSize(13);doc.text(d.guestName||'',ML+5,y+19);
+      doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(160,175,190);
+      if(d.guestEmail)doc.text(d.guestEmail,ML+5,y+28);
+      if(d.guestContact)doc.text(d.guestContact,ML+5,y+36);
+      doc.setFillColor(10,27,44);doc.roundedRect(113,y,77,50,2,2,'F');
+      doc.setTextColor(44,140,122);doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.text('STAY DETAILS',118,y+9);
+      doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(160,175,190);
+      doc.text('Room:      '+(d.roomId||''),118,y+19);doc.text('Type:        '+(d.roomType||''),118,y+27);
+      doc.text('Check-in:  '+(d.checkIn||''),118,y+35);doc.text('Check-out: '+(d.checkOut||'')+'  ('+d.nights+' nights)',118,y+43);
+      y+=62;
+      doc.setFillColor(44,140,122);doc.rect(ML,y,MR-ML,9,'F');
+      doc.setTextColor(6,17,31);doc.setFont('helvetica','bold');doc.setFontSize(8);
+      doc.text('DESCRIPTION',ML+4,y+6.5);doc.text('NIGHTS',138,y+6.5,{align:'center'});
+      doc.text('RATE/NIGHT',163,y+6.5,{align:'center'});doc.text('AMOUNT',MR-3,y+6.5,{align:'right'});
+      y+=13;doc.setFillColor(10,22,36);doc.rect(ML,y-4,MR-ML,12,'F');
+      doc.setTextColor(230,235,240);doc.setFont('helvetica','normal');doc.setFontSize(10);
+      doc.text(d.roomType||'',ML+4,y+4);doc.text(String(d.nights),138,y+4,{align:'center'});
+      doc.text(lkr(d.ratePerNight),163,y+4,{align:'center'});doc.text(lkr(d.subtotal),MR-3,y+4,{align:'right'});
+      y+=18;const sx=126;
+      doc.setFillColor(10,27,44);doc.rect(sx,y,MR-sx,42,'F');
+      doc.setTextColor(130,155,175);doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.text('Subtotal',sx+4,y+10);
+      doc.setTextColor(230,235,240);doc.setFont('helvetica','bold');doc.text(lkr(d.subtotal),MR-3,y+10,{align:'right'});
+      doc.setFont('helvetica','normal');doc.setTextColor(130,155,175);doc.text('VAT (12%)',sx+4,y+21);
+      doc.setTextColor(230,235,240);doc.setFont('helvetica','bold');doc.text(lkr(d.tax),MR-3,y+21,{align:'right'});
+      doc.setDrawColor(44,140,122);doc.setLineWidth(.3);doc.line(sx+2,y+27,MR-2,y+27);
+      doc.setFontSize(12);doc.setTextColor(200,169,110);doc.text('TOTAL DUE',sx+4,y+37);
+      doc.setFontSize(14);doc.text(lkr(d.total),MR-3,y+37,{align:'right'});
+      y+=55;
+      const sc=({confirmed:[44,140,122],checked_in:[200,169,110],checked_out:[80,120,180],cancelled:[217,97,75]})[d.status]||[44,140,122];
+      doc.setFillColor(sc[0]*.12+6,sc[1]*.12+6,sc[2]*.12+6);doc.roundedRect(ML,y,72,11,2,2,'F');
+      doc.setTextColor(...sc);doc.setFont('helvetica','bold');doc.setFontSize(7.5);
+      doc.text('● STATUS: '+(d.status||'').replace(/_/g,' ').toUpperCase(),ML+5,y+7.5);
+      doc.setFillColor(6,17,31);doc.rect(0,275,W,22,'F');
+      doc.setTextColor(100,125,150);doc.setFont('helvetica','normal');doc.setFontSize(8);
+      doc.text('Thank you for staying at Ocean View Resort. We look forward to welcoming you again.',W/2,284,{align:'center'});
+      doc.setTextColor(44,140,122);doc.text('oceanviewgalle.lk  ·  +94 91 222 4567  ·  Galle, Sri Lanka',W/2,291,{align:'center'});
+      doc.save('OVR_Invoice_'+(d.resNo||'bill')+'.pdf');
+    }
+    function lkr(v){ return 'LKR '+parseFloat(v||0).toLocaleString('en-LK',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+</script>
+</body>
+</html>
