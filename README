@@ -1,0 +1,258 @@
+# 🌊 OceanView Resort — Hotel Management System
+
+A full-stack hotel management web application built with **vanilla HTML/CSS/JavaScript** on the frontend and a **pure Java HTTP Server** (no frameworks) on the backend, using **Microsoft SQL Server** for data persistence. Built with Maven and tested with a comprehensive JUnit API test suite.
+
+> **Public Repository:** [https://github.com/faz2001/OceanViewResort](https://github.com/faz2001/OceanViewResort)
+> **Report:** [REPORT.md](./REPORT.md)
+
+---
+
+## 📖 Project Overview
+
+OceanView Resort is a multi-user hotel operations platform. Guests can browse rooms and make reservations online; staff members can manage rates, billing, and e-bills; and administrators oversee the full system. The entire backend is powered by a handcrafted Java HTTP server using only the built-in `com.sun.net.httpserver` package — no Spring, no Jakarta EE, no external web frameworks.
+
+---
+
+## ✨ Features
+
+### 👤 Authentication
+- User registration and login via `AuthHandler` / `AuthService`
+- Session-based access control across all protected endpoints
+- Role-aware routing (guest vs. staff vs. admin)
+
+### 🏨 Room Management
+- Browse and manage hotel rooms via `RoomHandler`
+- Room availability, type descriptions, and pricing display
+
+### 📅 Reservations
+- Full reservation lifecycle via `ReservationHandler` / `ReservationService`
+- Overlap/conflict detection before confirming bookings
+- Guest dashboard showing current and past reservations
+
+### 💳 Billing & E-Bills
+- Billing records generated per reservation via `BillingHandler` / `BillingService`
+- Electronic bill (e-bill) generation and retrieval via `EBillHandler`
+- Itemised invoice data returned as JSON
+
+### 👔 Staff Management
+- Staff accounts and records managed via `StaffHandler` / `StaffService`
+- Staff-only routes protected by role checks
+
+### 💰 Rate Management
+- Room rate configuration via `RateHandler`
+- Dynamic pricing support per room type
+
+### 🌐 Frontend (Vanilla JS)
+- `index.html` — Public-facing landing / home page
+- `OceanView_Public.html` — Public resort information page
+- `dashboard.html` — Authenticated user / staff dashboard
+
+### ⚙️ Technical Highlights
+- Pure Java `com.sun.net.httpserver.HttpServer` — zero web-framework dependencies
+- Maven build system (`pom.xml`) with standard `src/main` / `src/test` layout
+- MSSQL JDBC with parameterised queries (SQL injection prevention)
+- Hand-rolled `JsonUtil` for building JSON responses without external libraries
+- CORS preflight support verified by dedicated test
+- 10 JUnit API integration test classes covering all major endpoints
+- Two GitHub Actions workflows: Java CI and SLSA3 provenance publishing
+
+---
+
+## 🗂️ Project Structure
+
+```
+OceanViewResort/
+├── src/
+│   ├── main/java/com/hotel/
+│   │   ├── Main.java                        # Entry point — starts HTTP server
+│   │   ├── db/
+│   │   │   └── DBConnection.java            # MSSQL JDBC connection
+│   │   ├── handlers/
+│   │   │   ├── BaseHandler.java             # Shared handler utilities
+│   │   │   ├── AuthHandler.java             # Login / register
+│   │   │   ├── RoomHandler.java             # Room listing & management
+│   │   │   ├── ReservationHandler.java      # Reservation CRUD
+│   │   │   ├── BillingHandler.java          # Billing records
+│   │   │   ├── EBillHandler.java            # Electronic bills
+│   │   │   ├── RateHandler.java             # Room rate management
+│   │   │   └── StaffHandler.java            # Staff management
+│   │   ├── models/
+│   │   │   ├── User.java
+│   │   │   ├── Room.java
+│   │   │   └── Reservation.java
+│   │   ├── services/
+│   │   │   ├── AuthService.java
+│   │   │   ├── ReservationService.java
+│   │   │   ├── BillingService.java
+│   │   │   └── StaffService.java
+│   │   └── util/
+│   │       └── JsonUtil.java                # Custom JSON builder (no libraries)
+│   └── test/java/com/hotel/api/
+│       ├── ApiTestBase.java                 # Shared test setup
+│       ├── ApiSmokeTest.java
+│       ├── AuthApiTest.java
+│       ├── RoomsApiTest.java
+│       ├── ReservationsApiTest.java
+│       ├── BillingApiTest.java
+│       ├── EBillApiTest.java
+│       ├── RatesApiTest.java
+│       ├── StaffApiTest.java
+│       ├── CorsOptionsTest.java
+│       └── NotFoundContractTest.java
+├── ovr/
+│   ├── frontend/
+│   │   ├── index.html                       # Landing page
+│   │   ├── OceanView_Public.html            # Public resort info
+│   │   └── dashboard.html                   # User/staff dashboard
+│   └── sql/
+│       └── schema.sql                       # MSSQL database schema
+├── .github/
+│   └── workflows/
+│       ├── java-ci.yml                      # Build & test on every push
+│       └── generator-generic-ossf-slsa3-publish.yml   # SLSA3 provenance
+├── .gitattributes                           # linguist settings
+├── pom.xml                                  # Maven build config
+├── README.md
+└── REPORT.md
+```
+
+---
+
+## 🚀 Setup Instructions
+
+### Prerequisites
+
+| Tool | Version |
+|------|---------|
+| Java JDK | 17 or higher |
+| Maven | 3.8+ |
+| Microsoft SQL Server | 2019+ (or SQL Server Express) |
+| MSSQL JDBC Driver | Resolved automatically via `pom.xml` |
+
+---
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/faz2001/OceanViewResort.git
+cd OceanViewResort
+```
+
+### 2. Set Up the Database
+
+Run the schema script using SSMS or `sqlcmd`:
+
+```bash
+sqlcmd -S localhost -U sa -P yourPassword -i ovr/sql/schema.sql
+```
+
+### 3. Configure the Database Connection
+
+Edit `src/main/java/com/hotel/db/DBConnection.java`:
+
+```java
+private static final String URL      = "jdbc:sqlserver://localhost:1433;databaseName=OceanViewResort";
+private static final String USER     = "sa";
+private static final String PASSWORD = "yourPassword";
+```
+
+### 4. Build with Maven
+
+```bash
+mvn clean package
+```
+
+### 5. Run the Server
+
+```bash
+mvn exec:java -Dexec.mainClass="com.hotel.Main"
+```
+
+### 6. Run Tests
+
+```bash
+mvn test
+```
+
+Test reports are generated in `target/surefire-reports/`.
+
+### 7. Open in Browser
+
+```
+http://localhost:8080
+```
+
+---
+
+## 🖼️ Screenshots
+
+> *(Add screenshots to a `/screenshots` folder and update paths below)*
+
+| Page | Preview |
+|------|---------|
+| Landing Page (`index.html`) | `screenshots/index.png` |
+| Public Resort Page | `screenshots/public.png` |
+| User / Staff Dashboard | `screenshots/dashboard.png` |
+
+---
+
+## 🔀 Git Workflow
+
+This project used a **Feature Branch / Hotfix Workflow**. All changes were developed in dedicated branches and merged into `main` via pull requests. See [REPORT.md](./REPORT.md) for the full version control explanation.
+
+### Branches Used
+
+| Branch | Purpose |
+|--------|---------|
+| `main` | Stable, production-ready code |
+| `master` | Initial development trunk |
+| `feature/issue-1-health-endpoint` | Issue-tracked health-check feature |
+| `feature/health-endpoint` | Health-check endpoint iteration |
+| `hotfix/issue-2-db-error` | Urgent database error fix |
+
+### Tags / Releases
+
+```bash
+git tag -a v1.0.0 -m "Initial stable release"
+git tag -a v1.0.1 -m "Hotfix — database connection error resolved"
+git push origin --tags
+```
+
+### GitHub Actions CI
+
+Every push triggers two workflows:
+1. **`java-ci.yml`** — Maven build and full test suite
+2. **SLSA3 provenance** — Supply-chain security attestation
+
+---
+
+## 🧪 Tests
+
+10 JUnit API integration test classes cover every major endpoint:
+
+| Test Class | What It Tests |
+|------------|--------------|
+| `ApiSmokeTest` | Server starts and responds |
+| `AuthApiTest` | Login and registration |
+| `RoomsApiTest` | Room listing endpoints |
+| `ReservationsApiTest` | Full reservation lifecycle |
+| `BillingApiTest` | Billing record creation & retrieval |
+| `EBillApiTest` | Electronic bill generation |
+| `RatesApiTest` | Rate configuration endpoints |
+| `StaffApiTest` | Staff management endpoints |
+| `CorsOptionsTest` | CORS preflight responses |
+| `NotFoundContractTest` | 404 contract for unknown routes |
+
+---
+
+## 👥 Author
+
+| Name | GitHub |
+|------|--------|
+| Faz | [@faz2001](https://github.com/faz2001) |
+
+---
+
+## 📄 License
+
+Developed as an academic assignment. All rights reserved.
